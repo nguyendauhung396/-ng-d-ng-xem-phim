@@ -57,7 +57,7 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
           }
           .member-card-wrapper {
             background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(15, 23, 42, 0.05);
             border-radius: 12px;
             padding: 24px;
             box-shadow: var(--card-shadow);
@@ -107,7 +107,7 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
           }
           .dashboard-tabs-container {
             background: var(--bg-card);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(15, 23, 42, 0.05);
             border-radius: 12px;
             box-shadow: var(--card-shadow);
             overflow: hidden;
@@ -115,8 +115,8 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
           .dashboard-tabs-header {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            background: rgba(255, 255, 255, 0.02);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.02);
+            border-bottom: 1px solid rgba(15, 23, 42, 0.05);
           }
           .dashboard-tab-btn {
             border: none;
@@ -133,8 +133,8 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
             letter-spacing: 0.05em;
           }
           .dashboard-tab-btn.active {
-            background: rgba(255, 255, 255, 0.03);
-            color: #fff;
+            background: rgba(15, 23, 42, 0.03);
+            color: var(--text-dark);
             border-bottom-color: var(--primary-teal);
           }
           .dashboard-tabs-content {
@@ -163,15 +163,15 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
           }
           .profile-field-group input {
             padding: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(15, 23, 42, 0.1);
             border-radius: 8px;
-            background: rgba(8, 12, 20, 0.5);
-            color: #fff;
+            background: rgba(15, 23, 42, 0.02);
+            color: var(--text-dark);
             cursor: not-allowed;
           }
           .voucher-card {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(15, 23, 42, 0.02);
+            border: 1px solid rgba(15, 23, 42, 0.05);
             border-radius: 8px;
             padding: 16px;
             position: relative;
@@ -211,10 +211,10 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(255, 255, 255, 0.05)', paddingTop: '15px' }}>
-            <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#fff', marginBottom: '10px' }}>TIẾN TRÌNH HẠNG THẺ</h4>
+          <div style={{ borderTop: '1px solid rgba(15, 23, 42, 0.05)', paddingTop: '15px' }}>
+            <h4 style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '10px' }}>TIẾN TRÌNH HẠNG THẺ</h4>
             
-            <div style={{ position: 'relative', height: '6px', background: 'rgba(255, 255, 255, 0.1)', borderRadius: '3px', margin: '20px 0 10px' }}>
+            <div style={{ position: 'relative', height: '6px', background: 'rgba(15, 23, 42, 0.1)', borderRadius: '3px', margin: '20px 0 10px' }}>
               <div style={{ 
                 position: 'absolute', 
                 left: 0, 
@@ -225,9 +225,9 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
                 borderRadius: '3px' 
               }}></div>
               
-              <div style={{ position: 'absolute', left: '33%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary-teal)', border: '2px solid #fff' }}></div>
-              <div style={{ position: 'absolute', left: '66%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: isGold || isDiamond ? 'var(--primary-teal)' : 'rgba(255, 255, 255, 0.1)', border: '2px solid #fff' }}></div>
-              <div style={{ position: 'absolute', left: '100%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: isDiamond ? 'var(--primary-teal)' : 'rgba(255, 255, 255, 0.1)', border: '2px solid #fff' }}></div>
+              <div style={{ position: 'absolute', left: '33%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary-teal)', border: '2px solid var(--bg-card)' }}></div>
+              <div style={{ position: 'absolute', left: '66%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: isGold || isDiamond ? 'var(--primary-teal)' : 'rgba(15, 23, 42, 0.1)', border: '2px solid var(--bg-card)' }}></div>
+              <div style={{ position: 'absolute', left: '100%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: isDiamond ? 'var(--primary-teal)' : 'rgba(15, 23, 42, 0.1)', border: '2px solid var(--bg-card)' }}></div>
             </div>
 
             <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: '800', color: 'var(--text-muted)' }}>
@@ -236,8 +236,8 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
               <span>M-DIAMOND</span>
             </div>
 
-            <div style={{ marginTop: '15px', background: 'rgba(255, 255, 255, 0.02)', padding: '10px', borderRadius: '8px', fontSize: '11px', color: 'var(--text-muted)', border: '1px dashed rgba(255, 255, 255, 0.1)', textAlign: 'center' }}>
-              Tổng chi tiêu lũy kế: <b style={{ color: '#fff' }}>{user.totalSpending.toLocaleString('vi-VN')}đ</b>
+            <div style={{ marginTop: '15px', background: 'rgba(15, 23, 42, 0.02)', padding: '10px', borderRadius: '8px', fontSize: '11px', color: 'var(--text-muted)', border: '1px dashed rgba(15, 23, 42, 0.1)', textAlign: 'center' }}>
+              Tổng chi tiêu lũy kế: <b style={{ color: 'var(--text-dark)' }}>{user.totalSpending.toLocaleString('vi-VN')}đ</b>
             </div>
           </div>
         </div>

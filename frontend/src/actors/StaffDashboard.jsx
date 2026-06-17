@@ -700,7 +700,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
             <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>🎟 QUẦY BÁN VÉ TẠI RẠP</h1>
             <p className="muted" style={{ marginBottom: '24px' }}>Bán vé và thu tiền mặt trực tiếp từ khách hàng.</p>
 
-            <div className="admin-form-grid" style={{ marginBottom: '30px', background: 'var(--bg-card)', padding: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px' }}>
+            <div className="admin-form-grid" style={{ marginBottom: '30px', background: 'var(--bg-card)', padding: '24px', border: '1px solid rgba(15, 23, 42, 0.05)', borderRadius: '8px' }}>
               <div className="form-group">
                 <label>Chọn Phim Đang Chiếu</label>
                 <select value={staffMovieId} onChange={e => setStaffMovieId(e.target.value)}>
@@ -730,7 +730,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
             </div>
 
             {staffMovieId && staffDate && staffTime && (
-              <div style={{ background: 'var(--bg-card)', padding: '30px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px' }}>
+              <div style={{ background: 'var(--bg-card)', padding: '30px', border: '1px solid rgba(15, 23, 42, 0.05)', borderRadius: '8px' }}>
                 <div className="screen">MÀN HÌNH QUẦY SOÁT</div>
                 <div className="seats" style={{ maxWidth: '600px', margin: '0 auto 30px' }}>
                   {allSeats.map(seat => {
