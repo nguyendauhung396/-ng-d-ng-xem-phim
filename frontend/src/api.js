@@ -121,5 +121,24 @@ export const api = {
   createPayment: (payload) => request('/payments/create', { method: 'POST', body: JSON.stringify(payload) }),
   confirmPayment: (payload) => request('/payments/confirm', { method: 'POST', body: JSON.stringify(payload) }),
   cancelPayment: (payload) => request('/payments/cancel', { method: 'POST', body: JSON.stringify(payload) }),
-  getPaymentDetail: (id) => request(`/payments/${id}`)
+  getPaymentDetail: (id) => request(`/payments/${id}`),
+
+  // Website Settings (Dynamic Config)
+  getSettings: () => request('/settings'),
+  adminGetSettings: () => request('/admin/settings'),
+  adminUpdateSettings: (settings) => request('/admin/settings', { method: 'PUT', body: JSON.stringify({ settings }) }),
+
+  // Movie Gallery/Poster Images
+  getMovieImages: (movieId) => request(`/movies/${movieId}/images`),
+  adminAddMovieImage: (movieId, payload) => request(`/admin/movies/${movieId}/images`, { method: 'POST', body: JSON.stringify(payload) }),
+  adminDeleteMovieImage: (id) => request(`/admin/movies/images/${id}`, { method: 'DELETE' }),
+
+  // Product E-Shop Management
+  adminCreateProduct: (payload) => request('/admin/products', { method: 'POST', body: JSON.stringify(payload) }),
+  adminUpdateProduct: (id, payload) => request(`/admin/products/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  adminDeleteProduct: (id) => request(`/admin/products/${id}`, { method: 'DELETE' }),
+
+  // User Accounts locking and deletion
+  adminUpdateUserStatus: (id, status) => request(`/admin/users/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  adminDeleteUser: (id) => request(`/admin/users/${id}`, { method: 'DELETE' })
 };

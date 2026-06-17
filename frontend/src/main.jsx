@@ -516,6 +516,7 @@ function App() {
   const [promotionsList, setPromotionsList] = useState([]);
   const [appliedPromo, setAppliedPromo] = useState(null);
   const [promoCodeInput, setPromoCodeInput] = useState('');
+  const [siteConfig, setSiteConfig] = useState({});
 
   // Router state
   // Supported pages: '/home', '/lich-chieu-phim.html', '/phim.html', '/mua-sam.html', '/lien-he.html', '/tin-va-khuyen-mai.html', '/thong-tin-thanh-vien.html', '/ve-cua-toi.html', '/staff-dashboard.html', '/admin-dashboard.html'
@@ -684,13 +685,15 @@ function App() {
       api.getShowtimes(), 
       api.getProducts(), 
       api.getPromotions(),
-      api.getBanners().catch(() => [])
+      api.getBanners().catch(() => []),
+      api.getSettings().catch(() => ({}))
     ])
-      .then(([movieList, schedules, products, promos, bannerList]) => {
+      .then(([movieList, schedules, products, promos, bannerList, settings]) => {
         setMovies(movieList);
         setShowtimeData(schedules);
         setProductsList(products);
         setPromotionsList(promos);
+        setSiteConfig(settings || {});
 
         const mappedBanners = (bannerList && bannerList.length > 0)
           ? bannerList.map(b => ({
@@ -1343,6 +1346,7 @@ function App() {
               {currentPage === '/lien-he.html' && (
                 <LienHe 
                   submitContact={submitContact}
+                  siteConfig={siteConfig}
                 />
               )}
 
@@ -1626,11 +1630,11 @@ function App() {
                   <section id="contact" className="section contact-section container">
                     <div className="contact-grid">
                       <div className="contact-info">
-                        <h2>METIZ CINEMA ĐÀ NẴNG</h2>
+                        <h2>{(siteConfig.site_name || 'METIZ CINEMA').toUpperCase()} ĐÀ NẴNG</h2>
                         <p className="muted" style={{ fontSize: '15px', lineHeight: '1.8' }}>
-                          📍 Tầng 1, Helio Center, Đường 2/9, Hải Châu, Đà Nẵng.<br/>
-                          📞 Hotline: 0236 3630 689 • Giờ mở cửa: 08:00 - 23:30 mỗi ngày.<br/>
-                          ✉️ Email hỗ trợ khách hàng: contact@metiz.vn
+                          📍 {siteConfig.address || 'Tầng 1, Helio Center, Đường 2/9, Hải Châu, Đà Nẵng.'}<br/>
+                          📞 Hotline: {siteConfig.hotline || '0236 3630 689'} • Giờ mở cửa: {siteConfig.opening_hours || '08:00 - 23:30 mỗi ngày.'}<br/>
+                          ✉️ Email hỗ trợ khách hàng: {siteConfig.email || 'contact@metiz.vn'}
                         </p>
                         <p className="muted" style={{ fontStyle: 'italic' }}>
                           Cụm rạp chiếu phim hiện đại hàng đầu miền Trung, sở hữu hệ thống âm thanh Dolby Atmos cao cấp và hàng loạt tiện ích ẩm thực đẳng cấp tại Helio Center.
@@ -1675,18 +1679,18 @@ function App() {
               <div className="footer-col">
                 <h4>Chăm Sóc Khách Hàng</h4>
                 <p>
-                  Hotline hỗ trợ: 0236 3630 689<br/>
+                  Hotline hỗ trợ: {siteConfig.hotline || '0236 3630 689'}<br/>
                   Thời gian trực cuộc gọi từ 08:00 đến 22:00 hàng ngày.<br/>
-                  Email tiếp nhận góp ý: contact@metiz.vn
+                  Email tiếp nhận góp ý: {siteConfig.email || 'contact@metiz.vn'}
                 </p>
               </div>
               <div className="footer-col">
                 <h4>Kết nối với Metiz</h4>
                 <div className="social-links">
-                  <a href="https://facebook.com" target="_blank" className="social-btn">F</a>
+                  <a href={siteConfig.facebook_url || "https://facebook.com"} target="_blank" className="social-btn">F</a>
                   <a href="https://instagram.com" target="_blank" className="social-btn">I</a>
-                  <a href="https://tiktok.com" target="_blank" className="social-btn">T</a>
-                  <a href="https://youtube.com" target="_blank" className="social-btn">Y</a>
+                  <a href={siteConfig.tiktok_url || "https://tiktok.com"} target="_blank" className="social-btn">T</a>
+                  <a href={siteConfig.youtube_url || "https://youtube.com"} target="_blank" className="social-btn">Y</a>
                 </div>
                 <div className="app-downloads">
                   <div className="app-btn" onClick={() => alert('Download Metiz app on iOS App Store.')}>
@@ -1710,13 +1714,13 @@ function App() {
             <div className="container footer-bottom">
               <div className="footer-bottom-logo">
                 <span style={{ color: '#fff', fontWeight: 900, fontSize: '18px', letterSpacing: '0.05em' }}>
-                  METIZ CINEMA
+                  {siteConfig.site_name || 'METIZ CINEMA'}
                 </span>
                 <span className="registered-badge">✓ ĐÃ ĐĂNG KÝ BỘ CÔNG THƯƠNG</span>
               </div>
               <p style={{ fontSize: '12px' }}>
-                © 2026 Công Ty TNHH Metiz Cinema. Giấy CNĐKDN: 0401866112 - Sở KH&ĐT TP Đà Nẵng cấp lần đầu ngày 13/11/2017.<br/>
-                Địa chỉ: Helio Center, Đường 2/9, Phường Hòa Cường Bắc, Quận Hải Châu, Thành phố Đà Nẵng, Việt Nam.
+                {siteConfig.footer_text || '© 2026 Metiz Cinema. All Rights Reserved.'}<br/>
+                Địa chỉ: {siteConfig.address || 'Helio Center, Đường 2/9, Phường Hòa Cường Bắc, Quận Hải Châu, Thành phố Đà Nẵng, Việt Nam.'}
               </p>
             </div>
           </footer>

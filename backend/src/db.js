@@ -275,6 +275,11 @@ const User = sequelize.define('User', {
     type: DataTypes.STRING,
     allowNull: false,
     defaultValue: 'Thành viên Standard'
+  },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'active'
   }
 });
 
@@ -832,6 +837,71 @@ const HomeBanner = sequelize.define('HomeBanner', {
   }
 });
 
+const SiteSetting = sequelize.define('SiteSetting', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  settingKey: {
+    type: DataTypes.STRING,
+    unique: true,
+    allowNull: false
+  },
+  settingValue: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  settingType: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'string'
+  },
+  description: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  updatedBy: {
+    type: DataTypes.STRING,
+    allowNull: true
+  }
+});
+
+const MovieImage = sequelize.define('MovieImage', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  movieId: {
+    type: DataTypes.INTEGER,
+    allowNull: false
+  },
+  imageUrl: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  imageType: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'gallery' // 'poster', 'banner', 'thumbnail', 'gallery', 'background'
+  },
+  altText: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  sortOrder: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  status: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'active'
+  }
+});
+
 // Relationships
 Movie.hasMany(Showtime, { foreignKey: 'movieId', onDelete: 'CASCADE' });
 Showtime.belongsTo(Movie, { foreignKey: 'movieId' });
@@ -839,6 +909,8 @@ TicketScanLog.belongsTo(User, { foreignKey: 'staffId', as: 'Staff' });
 User.hasMany(TicketScanLog, { foreignKey: 'staffId' });
 HomeBanner.belongsTo(Movie, { foreignKey: 'movieId', as: 'Movie', onDelete: 'SET NULL' });
 Movie.hasMany(HomeBanner, { foreignKey: 'movieId', as: 'Banners' });
+Movie.hasMany(MovieImage, { foreignKey: 'movieId', as: 'Images', onDelete: 'CASCADE' });
+MovieImage.belongsTo(Movie, { foreignKey: 'movieId' });
 
 // Default Booked Seats
 const defaultBooked = ['A3', 'B5', 'C7', 'D2', 'E8', 'F4'];
@@ -1217,6 +1289,26 @@ async function syncAndSeed() {
       console.log('Sequelize: Seeded home banners.');
     }
 
+    // Seed default SiteSettings if empty
+    const settingCount = await SiteSetting.count();
+    if (settingCount === 0) {
+      await SiteSetting.bulkCreate([
+        { settingKey: 'site_name', settingValue: 'Metiz Cinema', settingType: 'string', description: 'Tên Website' },
+        { settingKey: 'hotline', settingValue: '1900 2078', settingType: 'string', description: 'Hotline liên hệ' },
+        { settingKey: 'email', settingValue: 'contact@metiz.vn', settingType: 'string', description: 'Email liên hệ' },
+        { settingKey: 'address', settingValue: 'Tầng 1, Lotte Mart Đà Nẵng, 06 Nại Nam, P. Hòa Cường Bắc, Q. Hải Châu, Đà Nẵng', settingType: 'string', description: 'Địa chỉ rạp' },
+        { settingKey: 'facebook_url', settingValue: 'https://facebook.com/metizcinema', settingType: 'string', description: 'Facebook Link' },
+        { settingKey: 'tiktok_url', settingValue: 'https://tiktok.com/@metizcinema', settingType: 'string', description: 'TikTok Link' },
+        { settingKey: 'youtube_url', settingValue: 'https://youtube.com/metizcinema', settingType: 'string', description: 'YouTube Link' },
+        { settingKey: 'opening_hours', settingValue: '08:00 - 23:30 hàng ngày', settingType: 'string', description: 'Thời gian mở cửa' },
+        { settingKey: 'booking_policy', settingValue: 'Vé đã mua không thể thay đổi hoặc hoàn trả ngoại trừ trường hợp hủy suất chiếu từ phía rạp.', settingType: 'text', description: 'Chính sách đặt vé' },
+        { settingKey: 'refund_policy', settingValue: 'Chính sách hoàn trả vé chỉ được áp dụng trước giờ chiếu ít nhất 60 phút và thực hiện bởi quản trị viên.', settingType: 'text', description: 'Chính sách hoàn vé' },
+        { settingKey: 'payment_guide', settingValue: 'Quý khách vui lòng hoàn tất thanh toán trong vòng 10 phút kể từ khi chọn ghế. Hỗ trợ thẻ nội địa, thẻ quốc tế và Ví điện tử.', settingType: 'text', description: 'Hướng dẫn thanh toán' },
+        { settingKey: 'footer_text', settingValue: '© 2026 Metiz Cinema. All Rights Reserved. Development & Operation by Antigravity.', settingType: 'text', description: 'Nội dung chân trang (Footer)' }
+      ]);
+      console.log('Sequelize: Seeded site settings.');
+    }
+
   } catch (error) {
     console.error('Sequelize: Sync and seed error:', error);
   }
@@ -1243,6 +1335,8 @@ module.exports = {
   QRLoginSession,
   TicketScanLog,
   HomeBanner,
+  SiteSetting,
+  MovieImage,
   defaultBooked,
   syncAndSeed
 };

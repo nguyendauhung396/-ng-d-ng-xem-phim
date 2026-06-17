@@ -2,7 +2,8 @@ import React from 'react';
 import { MascotLeft, MascotRight } from '../utils/helpers';
 
 export default function LienHe({
-  submitContact
+  submitContact,
+  siteConfig = {}
 }) {
   return (
     <section className="section container">
@@ -37,9 +38,9 @@ export default function LienHe({
         <div className="contact-info">
           <h2 style={{ fontSize: '22px', fontWeight: 800, color: '#111' }}>LIÊN HỆ BAN QUẢN TRỊ</h2>
           <p className="muted" style={{ fontSize: '14px', lineHeight: '1.8' }}>
-            📍 Địa chỉ cụm rạp: Helio Center, Đường 2/9, Hòa Cường Bắc, Hải Châu, Đà Nẵng.<br/>
-            📞 Điện thoại hotline: 0236 3630 689<br/>
-            ✉️ Email hỗ trợ trực tiếp: contact@metiz.vn
+            📍 Địa chỉ cụm rạp: {siteConfig.address || 'Helio Center, Đường 2/9, Hòa Cường Bắc, Hải Châu, Đà Nẵng.'}<br/>
+            📞 Điện thoại hotline: {siteConfig.hotline || '0236 3630 689'}<br/>
+            ✉️ Email hỗ trợ trực tiếp: {siteConfig.email || 'contact@metiz.vn'}
           </p>
           <form className="contact-form" onSubmit={submitContact} style={{ marginTop: '16px' }}>
             <input name="name" placeholder="Họ và tên của bạn" required />

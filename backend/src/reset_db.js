@@ -16,7 +16,9 @@ const {
   LoyaltyPoint,
   PointTransaction,
   QRLoginSession,
-  TicketScanLog
+  TicketScanLog,
+  SiteSetting,
+  MovieImage
 } = require('./db');
 const bcrypt = require('bcryptjs');
 
@@ -405,6 +407,31 @@ async function runResetAndSeed() {
     }
     await UserVoucher.bulkCreate(userVouchersToCreate);
     console.log('✅ Linked WELCOME50K voucher to top 20 members.');
+
+    // Seed SiteSettings
+    await SiteSetting.bulkCreate([
+      { settingKey: 'site_name', settingValue: 'Metiz Cinema', settingType: 'string', description: 'Tên Website' },
+      { settingKey: 'hotline', settingValue: '1900 2078', settingType: 'string', description: 'Hotline liên hệ' },
+      { settingKey: 'email', settingValue: 'contact@metiz.vn', settingType: 'string', description: 'Email liên hệ' },
+      { settingKey: 'address', settingValue: 'Tầng 1, Lotte Mart Đà Nẵng, 06 Nại Nam, P. Hòa Cường Bắc, Q. Hải Châu, Đà Nẵng', settingType: 'string', description: 'Địa chỉ rạp' },
+      { settingKey: 'facebook_url', settingValue: 'https://facebook.com/metizcinema', settingType: 'string', description: 'Facebook Link' },
+      { settingKey: 'tiktok_url', settingValue: 'https://tiktok.com/@metizcinema', settingType: 'string', description: 'TikTok Link' },
+      { settingKey: 'youtube_url', settingValue: 'https://youtube.com/metizcinema', settingType: 'string', description: 'YouTube Link' },
+      { settingKey: 'opening_hours', settingValue: '08:00 - 23:30 hàng ngày', settingType: 'string', description: 'Thời gian mở cửa' },
+      { settingKey: 'booking_policy', settingValue: 'Vé đã mua không thể thay đổi hoặc hoàn trả ngoại trừ trường hợp hủy suất chiếu từ phía rạp.', settingType: 'text', description: 'Chính sách đặt vé' },
+      { settingKey: 'refund_policy', settingValue: 'Chính sách hoàn trả vé chỉ được áp dụng trước giờ chiếu ít nhất 60 phút và thực hiện bởi quản trị viên.', settingType: 'text', description: 'Chính sách hoàn vé' },
+      { settingKey: 'payment_guide', settingValue: 'Quý khách vui lòng hoàn tất thanh toán trong vòng 10 phút kể từ khi chọn ghế. Hỗ trợ thẻ nội địa, thẻ quốc tế và Ví điện tử.', settingType: 'text', description: 'Hướng dẫn thanh toán' },
+      { settingKey: 'footer_text', settingValue: '© 2026 Metiz Cinema. All Rights Reserved. Development & Operation by Antigravity.', settingType: 'text', description: 'Nội dung chân trang (Footer)' }
+    ]);
+    console.log('✅ Seeded Site Settings.');
+
+    // Seed some MovieImage gallery images for the first movie
+    await MovieImage.bulkCreate([
+      { movieId: 1, imageUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80', imageType: 'gallery', altText: 'Gohan Poster 1', sortOrder: 1 },
+      { movieId: 1, imageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=600&auto=format&fit=crop&q=80', imageType: 'gallery', altText: 'Gohan Poster 2', sortOrder: 2 },
+      { movieId: 2, imageUrl: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=600&auto=format&fit=crop&q=80', imageType: 'gallery', altText: 'Doraemon Scene', sortOrder: 1 }
+    ]);
+    console.log('✅ Seeded Movie Gallery Images.');
 
     // 7. Seed Showtimes
     const dbMovies = movies.filter(m => m.status === 'now');

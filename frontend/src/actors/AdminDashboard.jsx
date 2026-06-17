@@ -50,6 +50,19 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
   const [editingMovie, setEditingMovie] = useState(null);
   const [editingShowtime, setEditingShowtime] = useState(null);
 
+  // Settings management states
+  const [adminSettings, setAdminSettings] = useState([]);
+  const [savingSettings, setSavingSettings] = useState(false);
+
+  // Products management states
+  const [adminProducts, setAdminProducts] = useState([]);
+  const [editingProduct, setEditingProduct] = useState(null);
+  const [isAddingProduct, setIsAddingProduct] = useState(false);
+
+  // Movie images (gallery) states
+  const [movieImages, setMovieImages] = useState([]);
+  const [newImageUrl, setNewImageUrl] = useState('');
+
   // API Call: Bookings List
   const loadAdminBookings = async () => {
     try {
@@ -142,6 +155,8 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
       if (adminTab === 'vouchers') loadAdminVouchers();
       if (adminTab === 'bookings') loadAdminBookings();
       if (adminTab === 'banners') loadAdminBanners();
+      if (adminTab === 'settings') loadAdminSettings();
+      if (adminTab === 'products') loadAdminProducts();
       if (adminTab === 'ticket-checkin') {
         loadAdminScanLogs(scanFilterResult);
         loadAdminScanStats();
@@ -149,11 +164,155 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
     }
   }, [adminTab, user, scanFilterResult]);
 
+  // Fetch movie gallery images when editing a movie
+  const loadMovieImages = async (movieId) => {
+    try {
+      const data = await api.getMovieImages(movieId);
+      setMovieImages(data);
+    } catch (err) {
+      console.log('Error loading movie images:', err);
+    }
+  };
+
+  useEffect(() => {
+    if (editingMovie && editingMovie.id) {
+      loadMovieImages(editingMovie.id);
+    } else {
+      setMovieImages([]);
+    }
+  }, [editingMovie]);
+
+  const handleAddMovieImage = async (e) => {
+    e.preventDefault();
+    if (!newImageUrl) return;
+    try {
+      await api.adminAddMovieImage(editingMovie.id, { imageUrl: newImageUrl, imageType: 'gallery', sortOrder: movieImages.length + 1 });
+      setNewImageUrl('');
+      loadMovieImages(editingMovie.id);
+      alert('Thêm hình ảnh thành công!');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleDeleteMovieImage = async (imgId) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa ảnh này khỏi bộ sưu tập?')) return;
+    try {
+      await api.adminDeleteMovieImage(imgId);
+      loadMovieImages(editingMovie.id);
+      alert('Xóa ảnh thành công!');
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   const changeUserRoleAdmin = async (userId, role) => {
     try {
       const result = await api.adminUpdateUserRole(userId, role);
       alert(result.message);
       loadAdminUsers();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleToggleUserStatus = async (userItem) => {
+    const nextStatus = userItem.status === 'locked' ? 'active' : 'locked';
+    if (!window.confirm(`Bạn có chắc chắn muốn ${nextStatus === 'locked' ? 'khóa' : 'mở khóa'} tài khoản của ${userItem.fullName}?`)) return;
+    try {
+      const res = await api.adminUpdateUserStatus(userItem.id, nextStatus);
+      alert(res.message);
+      loadAdminUsers();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAdminDeleteUser = async (userItem) => {
+    if (!window.confirm(`Bạn có chắc chắn muốn xóa vĩnh viễn tài khoản của ${userItem.fullName}?`)) return;
+    try {
+      const res = await api.adminDeleteUser(userItem.id);
+      alert(res.message);
+      loadAdminUsers();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  // Site Settings operations
+  const loadAdminSettings = async () => {
+    try {
+      const data = await api.adminGetSettings();
+      setAdminSettings(data);
+    } catch (err) {
+      console.log('Error loading settings:', err);
+    }
+  };
+
+  const handleSaveSettings = async (e) => {
+    e.preventDefault();
+    setSavingSettings(true);
+    try {
+      const payload = adminSettings.map(s => ({
+        settingKey: s.settingKey,
+        settingValue: document.getElementById(`setting-${s.settingKey}`).value
+      }));
+      await api.adminUpdateSettings(payload);
+      alert('Cập nhật cấu hình website thành công!');
+      loadAdminSettings();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setSavingSettings(false);
+    }
+  };
+
+  // Products operations
+  const loadAdminProducts = async () => {
+    try {
+      const data = await api.getProducts();
+      setAdminProducts(data);
+    } catch (err) {
+      console.log('Error loading products:', err);
+    }
+  };
+
+  const handleAdminCreateProduct = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+    payload.price = Number(payload.price);
+    try {
+      await api.adminCreateProduct(payload);
+      alert('Thêm sản phẩm thành công!');
+      setIsAddingProduct(false);
+      loadAdminProducts();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAdminUpdateProduct = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+    payload.price = Number(payload.price);
+    try {
+      await api.adminUpdateProduct(editingProduct.id, payload);
+      alert('Cập nhật sản phẩm thành công!');
+      setEditingProduct(null);
+      loadAdminProducts();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAdminDeleteProduct = async (id) => {
+    if (!window.confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) return;
+    try {
+      const res = await api.adminDeleteProduct(id);
+      alert(res.message);
+      loadAdminProducts();
     } catch (err) {
       alert(err.message);
     }
@@ -400,6 +559,18 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
           onClick={() => setAdminTab('ticket-checkin')}
         >
           🔍 Báo Cáo Soát Vé QR
+        </button>
+        <button 
+          className={`sidebar-btn ${adminTab === 'products' ? 'active' : ''}`} 
+          onClick={() => setAdminTab('products')}
+        >
+          🛍️ Quản Lý Sản Phẩm
+        </button>
+        <button 
+          className={`sidebar-btn ${adminTab === 'settings' ? 'active' : ''}`} 
+          onClick={() => setAdminTab('settings')}
+        >
+          ⚙️ Cấu Hình Hệ Thống
         </button>
         
         <hr style={{ borderColor: '#333', margin: '15px 0' }} />
@@ -654,6 +825,8 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                     <th>Hạng Thẻ</th>
                     <th>Chức Vụ</th>
                     <th>Thay Đổi Quyền</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -686,6 +859,36 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                           <option value="staff">STAFF (Soát vé/Quầy)</option>
                           <option value="admin">ADMIN (Quản trị viên)</option>
                         </select>
+                      </td>
+                      <td>
+                        <span style={{
+                          background: u.status === 'locked' ? '#f8d7da' : '#d4edda',
+                          color: u.status === 'locked' ? '#721c24' : '#155724',
+                          padding: '4px 10px',
+                          borderRadius: '3px',
+                          fontSize: '11px',
+                          fontWeight: 'bold'
+                        }}>
+                          {u.status === 'locked' ? 'KHÓA' : 'HOẠT ĐỘNG'}
+                        </span>
+                      </td>
+                      <td>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button 
+                            className="btn" 
+                            onClick={() => handleToggleUserStatus(u)} 
+                            style={{ background: u.status === 'locked' ? '#2ecc71' : '#f39c12', color: '#fff', fontSize: '11px', padding: '4px 8px' }}
+                          >
+                            {u.status === 'locked' ? 'MỞ KHÓA' : 'KHÓA'}
+                          </button>
+                          <button 
+                            className="btn" 
+                            onClick={() => handleAdminDeleteUser(u)} 
+                            style={{ background: '#e74c3c', color: '#fff', fontSize: '11px', padding: '4px 8px' }}
+                          >
+                            XÓA
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -1166,6 +1369,105 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
             </div>
           </div>
         )}
+
+        {adminTab === 'settings' && (
+          <div>
+            <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>⚙️ CẤU HÌNH WEBSITE & THÔNG TIN HỆ THỐNG</h1>
+            <p className="muted" style={{ marginBottom: '24px' }}>Cấu hình các thông số tĩnh như hotline, địa chỉ, email, chính sách, v.v. để hiển thị trên website mà không cần sửa code.</p>
+
+            <form onSubmit={handleSaveSettings} style={{ background: '#fff', padding: '24px', border: '1px solid #ddd', borderRadius: '4px' }}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '20px', marginBottom: '20px' }}>
+                {adminSettings.map(s => (
+                  <div key={s.settingKey} className="form-group" style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
+                    <label style={{ fontWeight: 'bold' }}>{s.description || s.settingKey} <span className="muted" style={{ fontSize: '12px', fontWeight: 'normal' }}>({s.settingKey})</span></label>
+                    {s.settingType === 'text' ? (
+                      <textarea 
+                        id={`setting-${s.settingKey}`}
+                        defaultValue={s.settingValue}
+                        style={{ width: '100%', height: '80px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }}
+                      />
+                    ) : (
+                      <input 
+                        id={`setting-${s.settingKey}`}
+                        type="text"
+                        defaultValue={s.settingValue}
+                        style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
+              <button type="submit" className="btn primary" disabled={savingSettings} style={{ background: 'var(--primary-teal)', color: '#fff' }}>
+                {savingSettings ? 'ĐANG LƯU...' : 'LƯU CẤU HÌNH HỆ THỐNG'}
+              </button>
+            </form>
+          </div>
+        )}
+
+        {adminTab === 'products' && (
+          <div>
+            <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>🛍️ QUẢN LÝ SẢN PHẨM BÁN KÈM (CONCESSIONS E-SHOP)</h1>
+            <p className="muted" style={{ marginBottom: '24px' }}>Admin có thể chủ động thêm mới, sửa đổi thông tin và đơn giá hoặc xóa sản phẩm bắp nước bán kèm.</p>
+
+            <div style={{ marginBottom: '20px' }}>
+              <button className="btn primary" onClick={() => setIsAddingProduct(true)} style={{ background: 'var(--primary-teal)', color: '#fff' }}>
+                ➕ THÊM SẢN PHẨM MỚI
+              </button>
+            </div>
+
+            <div className="admin-table-wrapper">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Ảnh</th>
+                    <th>Mã sản phẩm</th>
+                    <th>Tên Sản Phẩm</th>
+                    <th>Phân Loại</th>
+                    <th>Đơn Giá</th>
+                    <th>Mô Tả</th>
+                    <th>Hành Động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adminProducts.length > 0 ? (
+                    adminProducts.map(p => (
+                      <tr key={p.id}>
+                        <td>
+                          <img src={p.img || 'https://images.unsplash.com/photo-1513530534585-c7b1394c6d51?w=80&auto=format&fit=crop&q=60'} alt={p.name} style={{ width: '50px', height: '50px', objectFit: 'cover', borderRadius: '4px' }} />
+                        </td>
+                        <td><code>{p.id}</code></td>
+                        <td><b>{p.name}</b></td>
+                        <td>
+                          <span style={{ background: '#e8f4fd', color: '#004085', padding: '4px 8px', borderRadius: '3px', fontSize: '11px', fontWeight: 'bold' }}>
+                            {p.category === 'combos' ? 'Combo Bắp Nước' : p.category === 'merchandise' ? 'Đồ Lưu Niệm' : 'Thẻ Quà Tặng (eGift)'}
+                          </span>
+                        </td>
+                        <td><b style={{ color: 'var(--primary-teal)' }}>{money(p.price)}</b></td>
+                        <td style={{ maxWidth: '250px', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.desc}</td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '8px' }}>
+                            <button className="btn" style={{ background: '#3498db', color: '#fff', fontSize: '11px', padding: '6px 12px' }} onClick={() => setEditingProduct(p)}>
+                              SỬA
+                            </button>
+                            <button className="btn" style={{ background: '#e74c3c', color: '#fff', fontSize: '11px', padding: '6px 12px' }} onClick={() => handleAdminDeleteProduct(p.id)}>
+                              XÓA
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#888' }}>
+                        Chưa có sản phẩm bán kèm nào được khởi tạo dưới cơ sở dữ liệu.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* MODALS EDITING */}
@@ -1224,6 +1526,37 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                 <button type="button" className="btn outline" onClick={() => setEditingMovie(null)}>HỦY</button>
                 <button type="submit" className="btn primary" style={{ background: '#00adb5', color: '#fff' }}>LƯU THAY ĐỔI</button>
               </div>
+            </form>
+            
+            <hr style={{ margin: '25px 0', borderColor: '#eee' }} />
+            <h4 style={{ fontWeight: 900, marginBottom: '15px' }}>🖼️ BỘ SƯU TẬP HÌNH ẢNH (MOVIE GALLERY)</h4>
+            
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '10px', marginBottom: '20px' }}>
+              {movieImages.map(img => (
+                <div key={img.id} style={{ position: 'relative', border: '1px solid #eee', borderRadius: '4px', padding: '4px' }}>
+                  <img src={img.imageUrl} alt="Movie Gallery" style={{ width: '100%', height: '80px', objectFit: 'cover', borderRadius: '2px' }} />
+                  <button 
+                    type="button" 
+                    onClick={() => handleDeleteMovieImage(img.id)}
+                    style={{ position: 'absolute', top: '2px', right: '2px', background: '#e74c3c', color: '#fff', border: 'none', borderRadius: '50%', width: '20px', height: '20px', fontSize: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}
+                  >
+                    &times;
+                  </button>
+                </div>
+              ))}
+              {movieImages.length === 0 && <p style={{ fontSize: '13px', color: '#888', gridColumn: '1 / -1' }}>Chưa có hình ảnh nào trong bộ sưu tập.</p>}
+            </div>
+
+            <form onSubmit={handleAddMovieImage} style={{ display: 'flex', gap: '10px' }}>
+              <input 
+                type="text" 
+                placeholder="Nhập URL hình ảnh mới..." 
+                value={newImageUrl} 
+                onChange={e => setNewImageUrl(e.target.value)} 
+                required 
+                style={{ flex: 1, padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '13px' }} 
+              />
+              <button type="submit" className="btn primary" style={{ background: '#2ecc71', color: '#fff', fontSize: '12px', padding: '8px 12px', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>THÊM ẢNH</button>
             </form>
           </div>
         </div>
@@ -1334,6 +1667,99 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
               <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
                 <button type="button" className="btn outline" onClick={() => setEditingBanner(null)}>HỦY</button>
                 <button type="submit" className="btn primary" style={{ background: '#00adb5', color: '#fff' }}>LƯU THAY ĐỔI</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {isAddingProduct && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ fontWeight: 900, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>➕ THÊM SẢN PHẨM MỚI</span>
+              <button onClick={() => setIsAddingProduct(false)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#888' }}>&times;</button>
+            </h3>
+            <form onSubmit={handleAdminCreateProduct}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
+                <div className="form-group">
+                  <label>Mã sản phẩm (Viết liền, không dấu, ví dụ: combo1)</label>
+                  <input name="id" required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Tên sản phẩm</label>
+                  <input name="name" required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Phân loại</label>
+                  <select name="category" style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    <option value="combos">Combo Bắp Nước</option>
+                    <option value="merchandise">Đồ Lưu Niệm</option>
+                    <option value="egifts">Thẻ Quà Tặng (eGift)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Đơn giá (VNĐ)</label>
+                  <input name="price" type="number" required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Đường dẫn hình ảnh (URL)</label>
+                  <input name="img" style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Mô tả ngắn</label>
+                  <textarea name="desc" style={{ width: '100%', height: '70px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn outline" onClick={() => setIsAddingProduct(false)}>HỦY</button>
+                <button type="submit" className="btn primary" style={{ background: 'var(--primary-teal)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', padding: '8px 16px' }}>THÊM SẢN PHẨM</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editingProduct && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ fontWeight: 900, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>📝 SỬA THÔNG TIN SẢN PHẨM</span>
+              <button onClick={() => setEditingProduct(null)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#888' }}>&times;</button>
+            </h3>
+            <form onSubmit={handleAdminUpdateProduct}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '15px' }}>
+                <div className="form-group">
+                  <label>Mã sản phẩm (Không thể thay đổi)</label>
+                  <input name="id" value={editingProduct.id} readOnly style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', background: '#eee', color: '#666' }} />
+                </div>
+                <div className="form-group">
+                  <label>Tên sản phẩm</label>
+                  <input name="name" defaultValue={editingProduct.name} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Phân loại</label>
+                  <select name="category" defaultValue={editingProduct.category} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    <option value="combos">Combo Bắp Nước</option>
+                    <option value="merchandise">Đồ Lưu Niệm</option>
+                    <option value="egifts">Thẻ Quà Tặng (eGift)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Đơn giá (VNĐ)</label>
+                  <input name="price" type="number" defaultValue={editingProduct.price} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Đường dẫn hình ảnh (URL)</label>
+                  <input name="img" defaultValue={editingProduct.img || ''} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Mô tả ngắn</label>
+                  <textarea name="desc" defaultValue={editingProduct.desc || ''} style={{ width: '100%', height: '70px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn outline" onClick={() => setEditingProduct(null)}>HỦY</button>
+                <button type="submit" className="btn primary" style={{ background: 'var(--primary-teal)', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', padding: '8px 16px' }}>LƯU THAY ĐỔI</button>
               </div>
             </form>
           </div>

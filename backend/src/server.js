@@ -23,6 +23,8 @@ const {
   QRLoginSession,
   TicketScanLog,
   HomeBanner,
+  SiteSetting,
+  MovieImage,
   defaultBooked,
   syncAndSeed
 } = require('./db');
@@ -248,6 +250,10 @@ app.post('/api/auth/login', async (req, res) => {
     const user = await User.findOne({ where: { email } });
     if (!user || !bcrypt.compareSync(password, user.password)) {
       return res.status(401).json({ message: 'Sai tài khoản hoặc mật khẩu' });
+    }
+
+    if (user.status === 'locked') {
+      return res.status(403).json({ message: 'Tài khoản của bạn đã bị khóa! Vui lòng liên hệ Admin.' });
     }
 
     const token = jwt.sign({ id: user.id, role: user.role, fullName: user.fullName }, JWT_SECRET, { expiresIn: '24h' });
@@ -1509,6 +1515,277 @@ app.patch('/api/admin/banners/reorder', authenticateToken, requireRole(['admin']
     res.json({ message: 'Sắp xếp thứ tự banner thành công' });
   } catch (err) {
     res.status(500).json({ message: 'Lỗi sắp xếp thứ tự banner: ' + err.message });
+  }
+});
+
+
+// =========================================================================
+// 5.1 DYNAMIC WEBSITE CONFIGURATION (SITESETTING) & MOVIE IMAGE & PRODUCT APIS
+// =========================================================================
+
+// Public: Get all site settings
+app.get('/api/settings', async (req, res) => {
+  try {
+    const settings = await SiteSetting.findAll();
+    const config = {};
+    settings.forEach(s => {
+      config[s.settingKey] = s.settingValue;
+    });
+    res.json(config);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tải cấu hình website: ' + err.message });
+  }
+});
+
+// Admin: Get all raw settings
+app.get('/api/admin/settings', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const settings = await SiteSetting.findAll({ order: [['id', 'ASC']] });
+    res.json(settings);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tải danh sách cấu hình: ' + err.message });
+  }
+});
+
+// Admin: Update site settings
+app.put('/api/admin/settings', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const { settings } = req.body; // array of { settingKey, settingValue }
+    if (!settings || !Array.isArray(settings)) {
+      return res.status(400).json({ message: 'Thiếu danh sách cấu hình settings hoặc sai định dạng' });
+    }
+
+    for (const item of settings) {
+      await SiteSetting.update(
+        { settingValue: item.settingValue, updatedBy: req.user.fullName },
+        { where: { settingKey: item.settingKey } }
+      );
+    }
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'UPDATE_SITE_SETTINGS',
+      details: 'Cập nhật các thông số cấu hình hệ thống website.'
+    });
+
+    res.json({ message: 'Cập nhật cấu hình website thành công!' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi cập nhật cấu hình: ' + err.message });
+  }
+});
+
+// Public: Get gallery images for a movie
+app.get('/api/movies/:id/images', async (req, res) => {
+  try {
+    const images = await MovieImage.findAll({
+      where: { movieId: Number(req.params.id) },
+      order: [['sortOrder', 'ASC']]
+    });
+    res.json(images);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tải hình ảnh phim: ' + err.message });
+  }
+});
+
+// Admin: Add image to a movie
+app.post('/api/admin/movies/:id/images', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const movieId = Number(req.params.id);
+    const movie = await Movie.findByPk(movieId);
+    if (!movie) return res.status(404).json({ message: 'Không tìm thấy phim' });
+
+    const { imageUrl, imageType = 'gallery', altText = '', sortOrder = 0 } = req.body;
+    if (!imageUrl) {
+      return res.status(400).json({ message: 'Vui lòng cung cấp URL hình ảnh (imageUrl)' });
+    }
+
+    const movieImg = await MovieImage.create({
+      movieId,
+      imageUrl,
+      imageType,
+      altText,
+      sortOrder,
+      status: 'active'
+    });
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'ADD_MOVIE_IMAGE',
+      details: `Thêm hình ảnh (${imageType}) cho phim "${movie.title}"`
+    });
+
+    res.status(201).json(movieImg);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi thêm ảnh phim: ' + err.message });
+  }
+});
+
+// Admin: Delete a movie image
+app.delete('/api/admin/movies/images/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const img = await MovieImage.findByPk(Number(req.params.id));
+    if (!img) return res.status(404).json({ message: 'Không tìm thấy hình ảnh' });
+
+    const movie = await Movie.findByPk(img.movieId);
+    const movieTitle = movie ? movie.title : `Movie ID ${img.movieId}`;
+
+    await img.destroy();
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'DELETE_MOVIE_IMAGE',
+      details: `Xóa hình ảnh thành công khỏi phim "${movieTitle}"`
+    });
+
+    res.json({ message: 'Xóa hình ảnh thành công' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi xóa ảnh phim: ' + err.message });
+  }
+});
+
+// Admin: Add a new concession product
+app.post('/api/admin/products', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const { id, name, category, price, desc, img } = req.body;
+    if (!id || !name || !category || !price) {
+      return res.status(400).json({ message: 'Thiếu trường thông tin bắt buộc để thêm sản phẩm' });
+    }
+
+    const exists = await Product.findByPk(id);
+    if (exists) {
+      return res.status(409).json({ message: 'Mã sản phẩm này đã được sử dụng!' });
+    }
+
+    const product = await Product.create({ id, name, category, price, desc, img });
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'CREATE_PRODUCT',
+      details: `Thêm sản phẩm mới thành công: ${name} (${category})`
+    });
+
+    res.status(201).json(product);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi thêm sản phẩm: ' + err.message });
+  }
+});
+
+// Admin: Update concession product
+app.put('/api/admin/products/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const product = await Product.findByPk(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
+
+    await product.update(req.body);
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'UPDATE_PRODUCT',
+      details: `Cập nhật sản phẩm thành công: ${product.name}`
+    });
+
+    res.json(product);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi cập nhật sản phẩm: ' + err.message });
+  }
+});
+
+// Admin: Delete concession product (with booking/order verification check)
+app.delete('/api/admin/products/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const product = await Product.findByPk(req.params.id);
+    if (!product) return res.status(404).json({ message: 'Không tìm thấy sản phẩm' });
+
+    // Verify if any historical orders have ordered this product
+    const orders = await Order.findAll();
+    let isUsed = false;
+    for (const ord of orders) {
+      const items = ord.items || [];
+      if (items.some(item => item.id === product.id || item.productId === product.id)) {
+        isUsed = true;
+        break;
+      }
+    }
+
+    if (isUsed) {
+      return res.status(400).json({
+        message: 'Không thể xóa sản phẩm này vì đã có đơn hàng của khách hàng mua sản phẩm này! Vui lòng sửa thông tin hoặc ẩn sản phẩm thay thế.'
+      });
+    }
+
+    await product.destroy();
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'DELETE_PRODUCT',
+      details: `Xóa sản phẩm thành công: ${product.name}`
+    });
+
+    res.json({ message: 'Xóa sản phẩm thành công' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi xóa sản phẩm: ' + err.message });
+  }
+});
+
+// Admin: Lock/Unlock account
+app.patch('/api/admin/users/:id/status', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const { status } = req.body; // 'active' or 'locked'
+    if (!['active', 'locked'].includes(status)) {
+      return res.status(400).json({ message: 'Trạng thái tài khoản không hợp lệ' });
+    }
+
+    const user = await User.findByPk(Number(req.params.id));
+    if (!user) return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+
+    if (user.id === req.user.id) {
+      return res.status(400).json({ message: 'Bạn không thể tự khóa chính tài khoản của mình!' });
+    }
+
+    user.status = status;
+    await user.save();
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'TOGGLE_USER_STATUS',
+      details: `${status === 'locked' ? 'Khóa' : 'Mở khóa'} tài khoản người dùng: ${user.fullName}`
+    });
+
+    res.json({ message: 'Cập nhật trạng thái người dùng thành công', user });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi cập nhật trạng thái người dùng: ' + err.message });
+  }
+});
+
+// Admin: Delete user account (with booking transaction check)
+app.delete('/api/admin/users/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const user = await User.findByPk(Number(req.params.id));
+    if (!user) return res.status(404).json({ message: 'Không tìm thấy người dùng' });
+
+    if (user.id === req.user.id) {
+      return res.status(400).json({ message: 'Bạn không thể tự xóa tài khoản quản trị của mình!' });
+    }
+
+    // Check if user has historical bookings
+    const bookingsCount = await Booking.count({ where: { userId: user.id } });
+    if (bookingsCount > 0) {
+      return res.status(400).json({
+        message: 'Không thể xóa tài khoản này vì người dùng đã có giao dịch đặt vé xem phim trong hệ thống! Vui lòng chọn tính năng Khóa tài khoản.'
+      });
+    }
+
+    await user.destroy();
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'DELETE_USER',
+      details: `Xóa tài khoản người dùng: ${user.fullName} (${user.email})`
+    });
+
+    res.json({ message: 'Xóa tài khoản người dùng thành công' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi xóa tài khoản người dùng: ' + err.message });
   }
 });
 
