@@ -86,7 +86,17 @@ export const api = {
   adminDeleteMovie: (id) => request(`/admin/movies/${id}`, { method: 'DELETE' }),
   
   adminCreateShowtime: (payload) => request('/admin/showtimes', { method: 'POST', body: JSON.stringify(payload) }),
+  adminUpdateShowtime: (id, payload) => request(`/admin/showtimes/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
   adminDeleteShowtime: (id) => request(`/admin/showtimes/${id}`, { method: 'DELETE' }),
+
+  // Banners
+  getBanners: () => request('/banners'),
+  adminGetBanners: () => request('/admin/banners'),
+  adminCreateBanner: (payload) => request('/admin/banners', { method: 'POST', body: JSON.stringify(payload) }),
+  adminUpdateBanner: (id, payload) => request(`/admin/banners/${id}`, { method: 'PUT', body: JSON.stringify(payload) }),
+  adminDeleteBanner: (id) => request(`/admin/banners/${id}`, { method: 'DELETE' }),
+  adminUpdateBannerStatus: (id, status) => request(`/admin/banners/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status }) }),
+  adminReorderBanners: (orders) => request('/admin/banners/reorder', { method: 'PATCH', body: JSON.stringify({ orders }) }),
 
   // Voucher Management (Admin)
   adminGetVouchers: () => request('/admin/vouchers'),

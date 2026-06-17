@@ -44,6 +44,12 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
   const [adminScanStats, setAdminScanStats] = useState(null);
   const [scanFilterResult, setScanFilterResult] = useState('');
 
+  // Banner management & Edits
+  const [adminBanners, setAdminBanners] = useState([]);
+  const [editingBanner, setEditingBanner] = useState(null);
+  const [editingMovie, setEditingMovie] = useState(null);
+  const [editingShowtime, setEditingShowtime] = useState(null);
+
   // API Call: Bookings List
   const loadAdminBookings = async () => {
     try {
@@ -117,6 +123,16 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
     }
   };
 
+  // API Call: Banners List
+  const loadAdminBanners = async () => {
+    try {
+      const data = await api.adminGetBanners();
+      setAdminBanners(data);
+    } catch (err) {
+      console.log('Error loading admin banners:', err);
+    }
+  };
+
   // Fetch tab-specific data on change
   useEffect(() => {
     if (user?.role === 'admin') {
@@ -125,6 +141,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
       if (adminTab === 'audit-logs') loadAdminAuditLogs();
       if (adminTab === 'vouchers') loadAdminVouchers();
       if (adminTab === 'bookings') loadAdminBookings();
+      if (adminTab === 'banners') loadAdminBanners();
       if (adminTab === 'ticket-checkin') {
         loadAdminScanLogs(scanFilterResult);
         loadAdminScanStats();
@@ -243,6 +260,89 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
     }
   };
 
+  const handleAdminUpdateMovie = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+    try {
+      await api.adminUpdateMovie(editingMovie.id, payload);
+      alert('Cập nhật phim thành công!');
+      setEditingMovie(null);
+      loadBaseData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAdminUpdateShowtime = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+    try {
+      await api.adminUpdateShowtime(editingShowtime.id, payload);
+      alert('Cập nhật suất chiếu thành công!');
+      setEditingShowtime(null);
+      loadBaseData();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAdminCreateBanner = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+    if (payload.movieId) payload.movieId = Number(payload.movieId);
+    else delete payload.movieId;
+    payload.priority = payload.priority ? Number(payload.priority) : 0;
+    try {
+      await api.adminCreateBanner(payload);
+      alert('Tạo banner quảng cáo thành công!');
+      loadAdminBanners();
+      e.currentTarget.reset();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAdminUpdateBanner = async (e) => {
+    e.preventDefault();
+    const form = new FormData(e.currentTarget);
+    const payload = Object.fromEntries(form.entries());
+    if (payload.movieId) payload.movieId = Number(payload.movieId);
+    else payload.movieId = null;
+    payload.priority = payload.priority ? Number(payload.priority) : 0;
+    try {
+      await api.adminUpdateBanner(editingBanner.id, payload);
+      alert('Cập nhật banner quảng cáo thành công!');
+      setEditingBanner(null);
+      loadAdminBanners();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const handleAdminDeleteBanner = async (id) => {
+    if (!confirm('Bạn chắc chắn muốn xóa banner này?')) return;
+    try {
+      await api.adminDeleteBanner(id);
+      alert('Đã xóa banner quảng cáo.');
+      loadAdminBanners();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
+  const toggleBannerStatusAdmin = async (id, currentStatus) => {
+    try {
+      const newStatus = currentStatus === 'active' ? 'inactive' : 'active';
+      await api.adminUpdateBannerStatus(id, newStatus);
+      loadAdminBanners();
+    } catch (err) {
+      alert(err.message);
+    }
+  };
+
   return (
     <div className="dashboard-layout">
       <div className="dashboard-sidebar">
@@ -258,6 +358,12 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
           onClick={() => setAdminTab('movies')}
         >
           🎬 Quản Lý Phim
+        </button>
+        <button 
+          className={`sidebar-btn ${adminTab === 'banners' ? 'active' : ''}`} 
+          onClick={() => setAdminTab('banners')}
+        >
+          🖼️ Quản Lý Banner
         </button>
         <button 
           className={`sidebar-btn ${adminTab === 'showtimes' ? 'active' : ''}`} 
@@ -441,9 +547,14 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                       </td>
                       <td><b>{m.room}</b></td>
                       <td>
-                        <button className="btn" style={{ background: '#e74c3c', color: '#fff', fontSize: '11px', padding: '6px 14px' }} onClick={() => handleAdminDeleteMovie(m.id)}>
-                          XÓA
-                        </button>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button className="btn" style={{ background: '#3498db', color: '#fff', fontSize: '11px', padding: '6px 14px' }} onClick={() => setEditingMovie(m)}>
+                            SỬA
+                          </button>
+                          <button className="btn" style={{ background: '#e74c3c', color: '#fff', fontSize: '11px', padding: '6px 14px' }} onClick={() => handleAdminDeleteMovie(m.id)}>
+                            XÓA
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -510,9 +621,14 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                       <td><b style={{ color: 'var(--primary-teal)' }}>{s.time}</b></td>
                       <td>{s.room}</td>
                       <td>
-                        <button className="btn" style={{ background: '#e74c3c', color: '#fff', fontSize: '11px', padding: '6px 14px' }} onClick={() => handleAdminDeleteShowtime(s.id)}>
-                          XÓA LỊCH
-                        </button>
+                        <div style={{ display: 'flex', gap: '6px' }}>
+                          <button className="btn" style={{ background: '#3498db', color: '#fff', fontSize: '11px', padding: '6px 14px' }} onClick={() => setEditingShowtime(s)}>
+                            SỬA
+                          </button>
+                          <button className="btn" style={{ background: '#e74c3c', color: '#fff', fontSize: '11px', padding: '6px 14px' }} onClick={() => handleAdminDeleteShowtime(s.id)}>
+                            XÓA LỊCH
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -886,7 +1002,343 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
             </div>
           </div>
         )}
+
+        {adminTab === 'banners' && (
+          <div>
+            <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>🖼️ QUẢN LÝ BANNER QUẢNG CÁO TRANG CHỦ</h1>
+            <p className="muted" style={{ marginBottom: '24px' }}>Cấu hình slider quảng cáo trang chủ động, liên kết phim và thứ tự ưu tiên hiển thị.</p>
+
+            <form onSubmit={handleAdminCreateBanner} style={{ background: '#fff', padding: '24px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '30px' }}>
+              <h3 style={{ fontWeight: 900, marginBottom: '16px' }}>➕ THÊM BANNER MỚI</h3>
+              <div className="admin-form-grid">
+                <div className="form-group">
+                  <label>Tiêu đề chính</label>
+                  <input name="title" placeholder="Ví dụ: TẠM BIỆT GOHAN" required />
+                </div>
+                <div className="form-group">
+                  <label>Eyebrow (Dòng mô tả phụ phía trên)</label>
+                  <input name="eyebrow" placeholder="Ví dụ: Suất chiếu đặc biệt từ 18H" />
+                </div>
+                <div className="form-group">
+                  <label>Đường dẫn hình ảnh (URL)</label>
+                  <input name="imageUrl" placeholder="Nhập URL hình ảnh (1000x800 hoặc tỉ lệ tương đương)" required />
+                </div>
+                <div className="form-group">
+                  <label>Liên kết phim (Chọn nếu muốn liên kết)</label>
+                  <select name="movieId">
+                    <option value="">-- Không liên kết --</option>
+                    {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Chữ trên nút bấm</label>
+                  <input name="buttonText" placeholder="Ví dụ: Đặt vé ngay" defaultValue="Đặt vé ngay" />
+                </div>
+                <div className="form-group">
+                  <label>Liên kết khi bấm nút (Optional)</label>
+                  <input name="buttonLink" placeholder="Ví dụ: /lich-chieu-phim.html" />
+                </div>
+                <div className="form-group">
+                  <label>Độ ưu tiên hiển thị</label>
+                  <input name="priority" type="number" defaultValue="0" required />
+                </div>
+                <div className="form-group">
+                  <label>Trạng thái ban đầu</label>
+                  <select name="status">
+                    <option value="active">Hoạt động (Active)</option>
+                    <option value="inactive">Tạm ngưng (Inactive)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Ngày bắt đầu hiển thị</label>
+                  <input name="startDate" type="date" />
+                </div>
+                <div className="form-group">
+                  <label>Ngày kết thúc hiển thị</label>
+                  <input name="endDate" type="date" />
+                </div>
+              </div>
+              <div className="form-group" style={{ marginTop: '15px' }}>
+                <label>Mô tả chi tiết</label>
+                <textarea name="description" placeholder="Nội dung mô tả tóm tắt..." style={{ height: '70px', width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }}></textarea>
+              </div>
+              <button className="btn" style={{ background: '#111', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
+                TẠO BANNER QUẢNG CÁO MỚI
+              </button>
+            </form>
+
+            <h3 style={{ fontWeight: 900, marginBottom: '14px' }}>DANH SÁCH BANNER QUẢNG CÁO DƯỚI CƠ SỞ DỮ LIỆU</h3>
+            <div className="admin-table-wrapper">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>Ảnh Banner</th>
+                    <th>Tiêu đề / Eyebrow</th>
+                    <th>Liên Kết Phim</th>
+                    <th>Độ Ưu Tiên</th>
+                    <th>Thời Hạn Hiển Thị</th>
+                    <th>Trạng Thái</th>
+                    <th>Hành Động</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {adminBanners.length > 0 ? (
+                    adminBanners.map(b => (
+                      <tr key={b.id}>
+                        <td>
+                          <img src={b.imageUrl} alt={b.title} style={{ width: '120px', height: '60px', objectFit: 'cover', borderRadius: '4px', border: '1px solid #eee' }} />
+                        </td>
+                        <td>
+                          <div style={{ fontWeight: 'bold' }}>{b.title}</div>
+                          <div className="muted" style={{ fontSize: '11px' }}>{b.eyebrow}</div>
+                        </td>
+                        <td>
+                          {b.Movie ? (
+                            <span style={{ fontWeight: '600', color: 'var(--primary-teal)' }}>🎬 {b.Movie.title}</span>
+                          ) : (
+                            <span className="muted">Không liên kết</span>
+                          )}
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                            <b>{b.priority}</b>
+                            <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                              <button 
+                                onClick={async () => {
+                                  const orders = [{ id: b.id, priority: b.priority - 1 }];
+                                  await api.adminReorderBanners(orders);
+                                  loadAdminBanners();
+                                }} 
+                                style={{ padding: '0 4px', fontSize: '9px', cursor: 'pointer' }}
+                                title="Tăng thứ tự (giảm số priority)"
+                              >
+                                🔺
+                              </button>
+                              <button 
+                                onClick={async () => {
+                                  const orders = [{ id: b.id, priority: b.priority + 1 }];
+                                  await api.adminReorderBanners(orders);
+                                  loadAdminBanners();
+                                }} 
+                                style={{ padding: '0 4px', fontSize: '9px', cursor: 'pointer' }}
+                                title="Giảm thứ tự (tăng số priority)"
+                              >
+                                🔻
+                              </button>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span style={{ fontSize: '12px' }}>
+                            {b.startDate || 'N/A'} ~ {b.endDate || 'N/A'}
+                          </span>
+                        </td>
+                        <td>
+                          <button 
+                            className={`status-badge ${b.status === 'active' ? 'active' : 'inactive'}`} 
+                            style={{ border: 'none', cursor: 'pointer', fontWeight: 'bold' }}
+                            onClick={() => toggleBannerStatusAdmin(b.id, b.status)}
+                          >
+                            {b.status === 'active' ? 'Hoạt động' : 'Tạm ngưng'}
+                          </button>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', gap: '6px' }}>
+                            <button className="btn" style={{ background: '#3498db', color: '#fff', fontSize: '11px', padding: '6px 12px' }} onClick={() => setEditingBanner(b)}>
+                              SỬA
+                            </button>
+                            <button className="btn" style={{ background: '#e74c3c', color: '#fff', fontSize: '11px', padding: '6px 12px' }} onClick={() => handleAdminDeleteBanner(b.id)}>
+                              XÓA
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan="7" style={{ textAlign: 'center', padding: '30px', color: '#888' }}>
+                        Chưa có banner quảng cáo nào được khởi tạo dưới cơ sở dữ liệu.
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
+
+      {/* MODALS EDITING */}
+      {editingMovie && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ fontWeight: 900, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>📝 CẬP NHẬT PHIM</span>
+              <button onClick={() => setEditingMovie(null)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#888' }}>&times;</button>
+            </h3>
+            <form onSubmit={handleAdminUpdateMovie}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div className="form-group">
+                  <label>Tên phim</label>
+                  <input name="title" defaultValue={editingMovie.title} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Thể loại</label>
+                  <input name="genre" defaultValue={editingMovie.genre} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Độ tuổi (Badge)</label>
+                  <select name="age" defaultValue={editingMovie.age} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    <option value="P">P (Phổ biến rộng rãi)</option>
+                    <option value="K">K (Dành cho trẻ em)</option>
+                    <option value="T13">T13 (Trên 13 tuổi)</option>
+                    <option value="T16">T16 (Trên 16 tuổi)</option>
+                    <option value="T18">T18 (Trên 18 tuổi)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Thời lượng</label>
+                  <input name="duration" defaultValue={editingMovie.duration} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Poster URL</label>
+                  <input name="poster" defaultValue={editingMovie.poster} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Trạng thái</label>
+                  <select name="status" defaultValue={editingMovie.status} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    <option value="now">Đang Chiếu (Now Playing)</option>
+                    <option value="soon">Sắp Chiếu (Coming Soon)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Phòng chiếu cố định</label>
+                  <input name="room" defaultValue={editingMovie.room} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+              </div>
+              <div className="form-group" style={{ marginTop: '15px' }}>
+                <label>Mô tả ngắn</label>
+                <textarea name="desc" defaultValue={editingMovie.desc} required style={{ width: '100%', height: '80px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }} />
+              </div>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn outline" onClick={() => setEditingMovie(null)}>HỦY</button>
+                <button type="submit" className="btn primary" style={{ background: '#00adb5', color: '#fff' }}>LƯU THAY ĐỔI</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editingShowtime && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ fontWeight: 900, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>📝 CẬP NHẬT SUẤT CHIẾU</span>
+              <button onClick={() => setEditingShowtime(null)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#888' }}>&times;</button>
+            </h3>
+            <p style={{ fontSize: '12px', color: '#e74c3c', marginBottom: '15px' }}>
+              * Lưu ý: Nếu suất chiếu đã có khách mua vé, các thông tin Phim, Ngày, Giờ không được phép thay đổi.
+            </p>
+            <form onSubmit={handleAdminUpdateShowtime}>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <div className="form-group">
+                  <label>Phim chiếu</label>
+                  <select name="movieId" defaultValue={editingShowtime.movieId} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Ngày chiếu</label>
+                  <input name="date" type="date" defaultValue={editingShowtime.date} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Giờ chiếu</label>
+                  <select name="time" defaultValue={editingShowtime.time} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                    {showtimes.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Giá vé tiêu chuẩn (đ)</label>
+                  <input name="price" type="number" defaultValue={editingShowtime.price} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+              </div>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn outline" onClick={() => setEditingShowtime(null)}>HỦY</button>
+                <button type="submit" className="btn primary" style={{ background: '#00adb5', color: '#fff' }}>LƯU THAY ĐỔI</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {editingBanner && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+            <h3 style={{ fontWeight: 900, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <span>📝 CẬP NHẬT BANNER</span>
+              <button onClick={() => setEditingBanner(null)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#888' }}>&times;</button>
+            </h3>
+            <form onSubmit={handleAdminUpdateBanner}>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
+                <div className="form-group">
+                  <label>Tiêu đề chính</label>
+                  <input name="title" defaultValue={editingBanner.title} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Eyebrow (Dòng mô tả phụ phía trên)</label>
+                  <input name="eyebrow" defaultValue={editingBanner.eyebrow} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Liên kết phim (Chọn nếu muốn liên kết)</label>
+                  <select name="movieId" defaultValue={editingBanner.movieId || ''}>
+                    <option value="">-- Không liên kết --</option>
+                    {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Đường dẫn hình ảnh (URL)</label>
+                  <input name="imageUrl" defaultValue={editingBanner.imageUrl} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Chữ trên nút bấm</label>
+                  <input name="buttonText" defaultValue={editingBanner.buttonText} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Liên kết khi bấm nút (Optional)</label>
+                  <input name="buttonLink" defaultValue={editingBanner.buttonLink} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Độ ưu tiên hiển thị</label>
+                  <input name="priority" type="number" defaultValue={editingBanner.priority} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Trạng thái</label>
+                  <select name="status" defaultValue={editingBanner.status}>
+                    <option value="active">Hoạt động (Active)</option>
+                    <option value="inactive">Tạm ngưng (Inactive)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Ngày bắt đầu hiển thị</label>
+                  <input name="startDate" type="date" defaultValue={editingBanner.startDate || ''} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+                <div className="form-group">
+                  <label>Ngày kết thúc hiển thị</label>
+                  <input name="endDate" type="date" defaultValue={editingBanner.endDate || ''} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                </div>
+              </div>
+              <div className="form-group" style={{ marginTop: '15px' }}>
+                <label>Mô tả chi tiết</label>
+                <textarea name="description" defaultValue={editingBanner.description} style={{ width: '100%', height: '70px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }} />
+              </div>
+              <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
+                <button type="button" className="btn outline" onClick={() => setEditingBanner(null)}>HỦY</button>
+                <button type="submit" className="btn primary" style={{ background: '#00adb5', color: '#fff' }}>LƯU THAY ĐỔI</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

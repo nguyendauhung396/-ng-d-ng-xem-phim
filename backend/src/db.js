@@ -58,7 +58,7 @@ const Movie = sequelize.define('Movie', {
     allowNull: false
   },
   status: {
-    type: DataTypes.STRING, // 'now' or 'soon'
+    type: DataTypes.STRING, // 'now', 'soon', 'hidden', 'ended'
     allowNull: false
   },
   desc: {
@@ -71,6 +71,60 @@ const Movie = sequelize.define('Movie', {
   },
   poster: {
     type: DataTypes.STRING, // URL or local path
+    allowNull: true
+  },
+  slug: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  fullDescription: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  bannerImage: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  trailerUrl: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  director: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  actors: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  releaseDate: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  language: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  country: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  isFeatured: {
+    type: DataTypes.BOOLEAN,
+    allowNull: false,
+    defaultValue: false
+  },
+  sortOrder: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  createdBy: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  updatedBy: {
+    type: DataTypes.STRING,
     allowNull: true
   }
 });
@@ -711,11 +765,80 @@ const TicketScanLog = sequelize.define('TicketScanLog', {
   }
 });
 
+const HomeBanner = sequelize.define('HomeBanner', {
+  id: {
+    type: DataTypes.INTEGER,
+    primaryKey: true,
+    autoIncrement: true
+  },
+  movieId: {
+    type: DataTypes.INTEGER,
+    allowNull: true
+  },
+  title: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  eyebrow: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  description: {
+    type: DataTypes.TEXT,
+    allowNull: true
+  },
+  imageUrl: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  buttonText: {
+    type: DataTypes.STRING,
+    allowNull: false,
+    defaultValue: 'Đặt vé ngay'
+  },
+  buttonLink: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  position: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  priority: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+    defaultValue: 0
+  },
+  status: {
+    type: DataTypes.STRING, // 'active', 'inactive', 'expired'
+    allowNull: false,
+    defaultValue: 'active'
+  },
+  startDate: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  endDate: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  createdBy: {
+    type: DataTypes.STRING,
+    allowNull: true
+  },
+  updatedBy: {
+    type: DataTypes.STRING,
+    allowNull: true
+  }
+});
+
 // Relationships
 Movie.hasMany(Showtime, { foreignKey: 'movieId', onDelete: 'CASCADE' });
 Showtime.belongsTo(Movie, { foreignKey: 'movieId' });
 TicketScanLog.belongsTo(User, { foreignKey: 'staffId', as: 'Staff' });
 User.hasMany(TicketScanLog, { foreignKey: 'staffId' });
+HomeBanner.belongsTo(Movie, { foreignKey: 'movieId', as: 'Movie', onDelete: 'SET NULL' });
+Movie.hasMany(HomeBanner, { foreignKey: 'movieId', as: 'Banners' });
 
 // Default Booked Seats
 const defaultBooked = ['A3', 'B5', 'C7', 'D2', 'E8', 'F4'];
@@ -999,6 +1122,50 @@ async function syncAndSeed() {
       console.log('Sequelize: Seeded vouchers.');
     }
 
+    // Seed default HomeBanners if empty
+    const bannerCount = await HomeBanner.count();
+    if (bannerCount === 0) {
+      await HomeBanner.bulkCreate([
+        {
+          movieId: 1,
+          title: 'TẠM BIỆT GOHAN',
+          eyebrow: 'Suất chiếu đặc biệt từ 18H | 13-14.05.2026',
+          description: 'Tác phẩm đặc biệt tri ân chặng đường huyền thoại của vũ trụ ngọc rồng Dragon Ball. Lần đầu tiên chiến binh Gohan tỏa sáng rực rỡ với sức mạnh vô hạn.',
+          imageUrl: 'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=1000&auto=format&fit=crop&q=80',
+          buttonText: 'Đặt vé ngay',
+          buttonLink: '/home',
+          priority: 1,
+          status: 'active',
+          createdBy: 'system'
+        },
+        {
+          movieId: 2,
+          title: 'DORAEMON: BẢN GIAO HƯỞNG ĐỊA CẦU',
+          eyebrow: 'Phim điện ảnh gia đình xuất sắc nhất năm',
+          description: 'Mèo máy Doraemon và nhóm bạn Nobita dấn thân vào chuyến phiêu lưu âm nhạc kỳ vĩ để giải cứu nhân loại và mang giai điệu trở lại Trái Đất.',
+          imageUrl: 'https://images.unsplash.com/photo-1534447677768-be436bb09401?w=1000&auto=format&fit=crop&q=80',
+          buttonText: 'Đặt vé ngay',
+          buttonLink: '/home',
+          priority: 2,
+          status: 'active',
+          createdBy: 'system'
+        },
+        {
+          movieId: 3,
+          title: 'STAR WARS: MANDALORIAN & GROGU',
+          eyebrow: 'Siêu phẩm viễn tưởng đình đám từ Lucasfilm',
+          description: 'Bản hùng ca hoành tráng tiếp theo của thợ săn tiền thưởng Din Djarin và chú bé tí hon Grogu đáng yêu trong cuộc chiến bảo vệ thiên hà.',
+          imageUrl: 'https://images.unsplash.com/photo-1563089145-599997674d42?w=1000&auto=format&fit=crop&q=80',
+          buttonText: 'Đặt vé ngay',
+          buttonLink: '/home',
+          priority: 3,
+          status: 'active',
+          createdBy: 'system'
+        }
+      ]);
+      console.log('Sequelize: Seeded home banners.');
+    }
+
   } catch (error) {
     console.error('Sequelize: Sync and seed error:', error);
   }
@@ -1024,6 +1191,7 @@ module.exports = {
   VoucherMilestone,
   QRLoginSession,
   TicketScanLog,
+  HomeBanner,
   defaultBooked,
   syncAndSeed
 };

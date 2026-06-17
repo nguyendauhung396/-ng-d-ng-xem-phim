@@ -509,6 +509,7 @@ function App() {
   const [loginOpen, setLoginOpen] = useState(false);
   const [navOpen, setNavOpen] = useState(false);
   const [currentSlide, setCurrentSlide] = useState(0);
+  const [banners, setBanners] = useState([]);
 
   // Dynamic products & promo lists from DB
   const [productsList, setProductsList] = useState([]);
@@ -670,24 +671,36 @@ function App() {
 
   // Auto rotate banner slides
   useEffect(() => {
+    const slideCount = banners.length > 0 ? banners.length : bannerSlides.length;
     const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % bannerSlides.length);
+      setCurrentSlide((prev) => (prev + 1) % slideCount);
     }, 6000);
     return () => clearInterval(timer);
-  }, []);
+  }, [banners]);
 
   const loadBaseData = () => {
     Promise.all([
       api.getMovies(), 
       api.getShowtimes(), 
       api.getProducts(), 
-      api.getPromotions()
+      api.getPromotions(),
+      api.getBanners().catch(() => [])
     ])
-      .then(([movieList, schedules, products, promos]) => {
+      .then(([movieList, schedules, products, promos, bannerList]) => {
         setMovies(movieList);
         setShowtimeData(schedules);
         setProductsList(products);
         setPromotionsList(promos);
+
+        const mappedBanners = (bannerList && bannerList.length > 0)
+          ? bannerList.map(b => ({
+              ...b,
+              img: b.imageUrl,
+              desc: b.description
+            }))
+          : bannerSlides;
+        setBanners(mappedBanners);
+
         if (schedules.length > 0) {
           const uniqueDates = [...new Set(schedules.map((s) => s.date))].sort();
           setActiveDate(uniqueDates[0] || new Date().toISOString().slice(0, 10));
@@ -1278,7 +1291,7 @@ function App() {
             <>
               {currentPage === '/home' && (
                 <Home 
-                  bannerSlides={bannerSlides}
+                  bannerSlides={banners.length > 0 ? banners : bannerSlides}
                   currentSlide={currentSlide}
                   setCurrentSlide={setCurrentSlide}
                   nowMovies={nowMovies}

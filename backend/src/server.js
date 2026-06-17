@@ -22,6 +22,7 @@ const {
   VoucherMilestone,
   QRLoginSession,
   TicketScanLog,
+  HomeBanner,
   defaultBooked,
   syncAndSeed
 } = require('./db');
@@ -1276,6 +1277,241 @@ app.delete('/api/admin/showtimes/:id', authenticateToken, requireRole(['admin'])
     res.status(500).json({ message: 'Lỗi xóa suất chiếu: ' + err.message });
   }
 });
+
+app.put('/api/admin/showtimes/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const showtime = await Showtime.findByPk(req.params.id);
+    if (!showtime) return res.status(404).json({ message: 'Không tìm thấy suất chiếu' });
+
+    const bookedCount = await BookedSeat.count({ where: { showtimeId: showtime.id } });
+    
+    const { movieId, date, time, price } = req.body;
+    
+    // If booked, restrict changing key fields
+    if (bookedCount > 0) {
+      if ((movieId && Number(movieId) !== showtime.movieId) ||
+          (date && date !== showtime.date) ||
+          (time && time !== showtime.time)) {
+        return res.status(400).json({
+          message: 'Không thể chỉnh sửa Phim, Ngày chiếu, Giờ chiếu của suất chiếu đã có vé đặt!'
+        });
+      }
+    }
+
+    const targetMovieId = movieId ? Number(movieId) : showtime.movieId;
+    const targetDate = date || showtime.date;
+    const targetTime = time || showtime.time;
+
+    const movie = await Movie.findByPk(targetMovieId);
+    if (!movie) return res.status(404).json({ message: 'Không tìm thấy phim tương ứng' });
+
+    // Conflict checking
+    function timeToMinutes(timeStr) {
+      const [h, m] = timeStr.split(':').map(Number);
+      return h * 60 + m;
+    }
+
+    const existingShowtimes = (await Showtime.findAll({ where: { date: targetDate, room: movie.room } }))
+      .filter(ext => ext.id !== showtime.id);
+
+    const newDuration = parseInt(movie.duration) || 120;
+    const newStart = timeToMinutes(targetTime);
+    const newEnd = newStart + newDuration + 15;
+
+    for (const ext of existingShowtimes) {
+      const extMovie = await Movie.findByPk(ext.movieId);
+      const extDuration = extMovie ? (parseInt(extMovie.duration) || 120) : 120;
+      const extStart = timeToMinutes(ext.time);
+      const extEnd = extStart + extDuration + 15;
+
+      if (Math.max(newStart, extStart) < Math.min(newEnd, extEnd)) {
+        return res.status(409).json({
+          message: `Xung đột lịch chiếu! Phòng "${movie.room}" đang có phim "${ext.movieTitle}" chiếu từ ${ext.time} (kéo dài đến ${Math.floor(extEnd/60)}:${String(extEnd%60).padStart(2, '0')} bao gồm dọn phòng).`
+        });
+      }
+    }
+
+    const newId = `${targetMovieId}-${targetDate}-${targetTime}`;
+
+    await Showtime.update({
+      id: newId,
+      movieId: movie.id,
+      movieTitle: movie.title,
+      date: targetDate,
+      time: targetTime,
+      room: movie.room,
+      price: price !== undefined ? Number(price) : showtime.price
+    }, {
+      where: { id: showtime.id }
+    });
+
+    const updatedShowtime = await Showtime.findByPk(newId);
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'UPDATE_SHOWTIME',
+      details: `Cập nhật lịch chiếu thành công: Từ ${showtime.id} sang ${newId}`
+    });
+
+    res.json(updatedShowtime);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi cập nhật suất chiếu: ' + err.message });
+  }
+});
+
+// Public Banners list
+app.get('/api/banners', async (req, res) => {
+  try {
+    const today = new Date().toISOString().slice(0, 10);
+    const list = await HomeBanner.findAll({
+      where: { status: 'active' },
+      include: [{ model: Movie, as: 'Movie', attributes: ['id', 'title', 'poster', 'genre', 'age', 'room'] }],
+      order: [['priority', 'ASC']]
+    });
+    const filtered = list.filter(b => {
+      if (b.startDate && b.startDate > today) return false;
+      if (b.endDate && b.endDate < today) return false;
+      return true;
+    });
+    res.json(filtered);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tải danh sách banner: ' + err.message });
+  }
+});
+
+// Admin Banners CRUD
+app.get('/api/admin/banners', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const list = await HomeBanner.findAll({
+      include: [{ model: Movie, as: 'Movie', attributes: ['id', 'title', 'poster'] }],
+      order: [['priority', 'ASC']]
+    });
+    res.json(list);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tải danh sách banner admin: ' + err.message });
+  }
+});
+
+app.post('/api/admin/banners', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const { movieId, title, eyebrow, description, imageUrl, buttonText, buttonLink, priority, status, startDate, endDate } = req.body;
+    if (!title || !imageUrl) {
+      return res.status(400).json({ message: 'Tiêu đề và đường dẫn hình ảnh là bắt buộc' });
+    }
+    const banner = await HomeBanner.create({
+      movieId: movieId ? Number(movieId) : null,
+      title,
+      eyebrow,
+      description,
+      imageUrl,
+      buttonText: buttonText || 'Đặt vé ngay',
+      buttonLink,
+      priority: priority !== undefined ? Number(priority) : 0,
+      status: status || 'active',
+      startDate,
+      endDate,
+      createdBy: req.user.fullName
+    });
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'CREATE_BANNER',
+      details: `Tạo banner quảng cáo mới thành công: ${title}`
+    });
+    res.status(201).json(banner);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi tạo banner quảng cáo: ' + err.message });
+  }
+});
+
+app.put('/api/admin/banners/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const banner = await HomeBanner.findByPk(Number(req.params.id));
+    if (!banner) return res.status(404).json({ message: 'Không tìm thấy banner' });
+
+    const { movieId, title, eyebrow, description, imageUrl, buttonText, buttonLink, priority, status, startDate, endDate } = req.body;
+    await banner.update({
+      movieId: movieId !== undefined ? (movieId ? Number(movieId) : null) : banner.movieId,
+      title: title || banner.title,
+      eyebrow: eyebrow !== undefined ? eyebrow : banner.eyebrow,
+      description: description !== undefined ? description : banner.description,
+      imageUrl: imageUrl || banner.imageUrl,
+      buttonText: buttonText || banner.buttonText,
+      buttonLink: buttonLink !== undefined ? buttonLink : banner.buttonLink,
+      priority: priority !== undefined ? Number(priority) : banner.priority,
+      status: status || banner.status,
+      startDate: startDate !== undefined ? startDate : banner.startDate,
+      endDate: endDate !== undefined ? endDate : banner.endDate,
+      updatedBy: req.user.fullName
+    });
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'UPDATE_BANNER',
+      details: `Cập nhật banner quảng cáo thành công: ${banner.title}`
+    });
+    res.json(banner);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi cập nhật banner quảng cáo: ' + err.message });
+  }
+});
+
+app.delete('/api/admin/banners/:id', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const banner = await HomeBanner.findByPk(Number(req.params.id));
+    if (!banner) return res.status(404).json({ message: 'Không tìm thấy banner' });
+
+    await banner.destroy();
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'DELETE_BANNER',
+      details: `Xóa banner quảng cáo thành công: ${banner.title}`
+    });
+    res.json({ message: 'Xóa banner quảng cáo thành công' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi xóa banner quảng cáo: ' + err.message });
+  }
+});
+
+app.patch('/api/admin/banners/:id/status', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const banner = await HomeBanner.findByPk(Number(req.params.id));
+    if (!banner) return res.status(404).json({ message: 'Không tìm thấy banner' });
+
+    const { status } = req.body;
+    banner.status = status;
+    await banner.save();
+
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'UPDATE_BANNER_STATUS',
+      details: `Cập nhật trạng thái banner ${banner.title} thành ${status}`
+    });
+    res.json(banner);
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi cập nhật trạng thái banner: ' + err.message });
+  }
+});
+
+app.patch('/api/admin/banners/reorder', authenticateToken, requireRole(['admin']), async (req, res) => {
+  try {
+    const { orders } = req.body; // array of { id, priority }
+    if (!orders || !Array.isArray(orders)) {
+      return res.status(400).json({ message: 'Thiếu hoặc sai định dạng mảng orders' });
+    }
+    for (const item of orders) {
+      await HomeBanner.update({ priority: Number(item.priority) }, { where: { id: Number(item.id) } });
+    }
+    await AuditLog.create({
+      actor: req.user.fullName,
+      action: 'REORDER_BANNERS',
+      details: `Sắp xếp lại thứ tự ưu tiên các banner`
+    });
+    res.json({ message: 'Sắp xếp thứ tự banner thành công' });
+  } catch (err) {
+    res.status(500).json({ message: 'Lỗi sắp xếp thứ tự banner: ' + err.message });
+  }
+});
+
 
 // Admin Reports (Sales & Activity summaries)
 app.get('/api/admin/reports/revenue', authenticateToken, requireRole(['admin']), async (req, res) => {
