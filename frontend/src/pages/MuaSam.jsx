@@ -40,7 +40,7 @@ export default function MuaSam({
                 </span>
                 <button 
                   className="btn" 
-                  style={{ background: 'linear-gradient(135deg, #00adb5, #00d2c4)', color: '#fff', fontSize: '11px', padding: '6px 14px', borderRadius: '8px' }}
+                  style={{ background: 'linear-gradient(135deg, #00adb5, #00d2c4)', color: '#fff', fontSize: '11px', padding: '6px 14px', borderRadius: '4px' }}
                   onClick={() => addToCart(item)}
                 >
                   CHỌN MUA

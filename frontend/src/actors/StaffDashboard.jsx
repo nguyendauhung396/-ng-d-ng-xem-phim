@@ -333,7 +333,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
             <p className="muted" style={{ marginBottom: '24px' }}>Hệ thống soát vé thông minh: Quét QR Code vé, mã Booking hoặc nhập thủ công để check-in.</p>
 
             {/* Main Action Bar */}
-            <div className="ticket-scan-box" style={{ background: 'var(--bg-card)', border: '1px dashed rgba(255, 255, 255, 0.1)', padding: '24px', borderRadius: '8px', marginBottom: '30px' }}>
+            <div className="ticket-scan-box" style={{ background: '#fafafa', border: '1px dashed #bbb', padding: '24px', borderRadius: '6px', marginBottom: '30px' }}>
               <label style={{ fontWeight: 800, fontSize: '12px', display: 'block', marginBottom: '8px' }}>NHẬP MÃ QR VÉ / MÃ BOOKING</label>
               <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '15px' }}>
                 <input 
@@ -342,7 +342,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                   onChange={e => setStaffLookupCode(e.target.value)} 
                   style={{ flexGrow: 1, minWidth: '250px' }}
                 />
-                <button className="btn" style={{ background: 'var(--primary-teal)', color: '#fff', padding: '0 24px' }} onClick={() => handleVerifyOrScanCode()}>
+                <button className="btn" style={{ background: '#111', color: '#fff', padding: '0 24px' }} onClick={() => handleVerifyOrScanCode()}>
                   XÁC MINH VÉ
                 </button>
               </div>
@@ -393,24 +393,24 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
             {/* SCREEN 1: Single Ticket verification result (Valid / Invalid) */}
             {qrVerifyResult && (
               <div style={{ 
-                background: qrVerifyResult.success && qrVerifyResult.data.status === 'valid' ? 'rgba(46, 204, 113, 0.05)' : 'rgba(231, 76, 60, 0.05)', 
-                border: qrVerifyResult.success && qrVerifyResult.data.status === 'valid' ? '1px solid #2ecc71' : '1px solid #e74c3c',
+                background: qrVerifyResult.success && qrVerifyResult.data.status === 'valid' ? '#eefbf3' : '#fdf2f2', 
+                border: qrVerifyResult.success && qrVerifyResult.data.status === 'valid' ? '2px solid #2ecc71' : '2px solid #e74c3c',
                 padding: '30px', 
                 borderRadius: '8px', 
                 marginBottom: '30px',
-                color: '#fff'
+                color: '#222'
               }}>
                 {qrVerifyResult.success && qrVerifyResult.data.status === 'valid' ? (
                   <div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
                       <span style={{ fontSize: '36px', color: '#2ecc71' }}>✅</span>
                       <div>
-                        <h2 style={{ margin: 0, color: '#2ecc71', fontWeight: 900 }}>VÉ HỢP LỆ</h2>
-                        <p style={{ margin: 0, fontSize: '13px', color: '#2ecc71' }}>Suất chiếu chính xác & đã thanh toán. Đủ điều kiện vào rạp.</p>
+                        <h2 style={{ margin: 0, color: '#27ae60', fontWeight: 900 }}>VÉ HỢP LỆ</h2>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#27ae60' }}>Suất chiếu chính xác & đã thanh toán. Đủ điều kiện vào rạp.</p>
                       </div>
                     </div>
 
-                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', background: 'rgba(255, 255, 255, 0.02)', padding: '20px', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.05)' }}>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', background: '#fff', padding: '20px', borderRadius: '6px', border: '1px solid #d4edda' }}>
                       <div>
                         <p style={{ margin: '6px 0' }}>Mã vé: <b>{qrVerifyResult.data.ticketCode}</b></p>
                         <p style={{ margin: '6px 0' }}>Tên phim: <b style={{ color: 'var(--primary-teal)' }}>{qrVerifyResult.data.movieName}</b></p>
@@ -433,7 +433,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                       </button>
                       <button 
                         className="btn" 
-                        style={{ background: '#333', color: '#fff', padding: '12px 20px' }}
+                        style={{ background: '#7f8c8d', color: '#fff', padding: '12px 20px' }}
                         onClick={() => setQrVerifyResult(null)}
                       >
                         HỦY BỎ
@@ -445,15 +445,15 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                     <div style={{ display: 'flex', alignItems: 'center', gap: '15px', marginBottom: '20px' }}>
                       <span style={{ fontSize: '36px', color: '#e74c3c' }}>❌</span>
                       <div>
-                        <h2 style={{ margin: 0, color: '#e74c3c', fontWeight: 900 }}>VÉ KHÔNG HỢP LỆ / BỊ TỪ CHỐI</h2>
-                        <p style={{ margin: 0, fontSize: '13px', color: '#e74c3c' }}>
+                        <h2 style={{ margin: 0, color: '#c0392b', fontWeight: 900 }}>VÉ KHÔNG HỢP LỆ / BỊ TỪ CHỐI</h2>
+                        <p style={{ margin: 0, fontSize: '13px', color: '#c0392b' }}>
                           Lý do: {qrVerifyResult.message || (qrVerifyResult.data && qrVerifyResult.data.status === 'checked_in' ? 'Vé đã được check-in sử dụng' : 'Lỗi xác thực vé')}
                         </p>
                       </div>
                     </div>
 
                     {qrVerifyResult.data && (
-                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', background: 'rgba(255, 255, 255, 0.02)', padding: '20px', borderRadius: '6px', border: '1px solid rgba(255, 255, 255, 0.05)', marginBottom: '20px' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', background: '#fff', padding: '20px', borderRadius: '6px', border: '1px solid #f5c6cb', marginBottom: '20px' }}>
                         <div>
                           <p style={{ margin: '6px 0' }}>Mã vé: <b>{qrVerifyResult.data.ticketCode}</b></p>
                           <p style={{ margin: '6px 0' }}>Tên phim: <b>{qrVerifyResult.data.movieName}</b></p>
@@ -463,7 +463,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                           <p style={{ margin: '6px 0' }}>Trạng thái vé: <b style={{ color: '#e74c3c' }}>{qrVerifyResult.data.status}</b></p>
                           <p style={{ margin: '6px 0' }}>Khách hàng: <b>{qrVerifyResult.data.customerName}</b></p>
                           {qrVerifyResult.data.checkedInAt && (
-                            <p style={{ margin: '6px 0', fontSize: '12px', color: 'var(--text-muted)' }}>
+                            <p style={{ margin: '6px 0', fontSize: '12px', color: '#7f8c8d' }}>
                               Đã check-in lúc: {qrVerifyResult.data.checkedInAt}
                             </p>
                           )}
@@ -485,8 +485,8 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
 
             {/* SCREEN 2: Multiple Tickets Booking scanner panel */}
             {isBookingScan && bookingScanData && (
-              <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(255, 255, 255, 0.05)', padding: '30px', borderRadius: '8px', marginBottom: '30px' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '15px', marginBottom: '20px' }}>
+              <div style={{ background: '#fff', border: '1px solid #ddd', padding: '30px', borderRadius: '8px', marginBottom: '30px' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: '2px solid #eee', paddingBottom: '15px', marginBottom: '20px' }}>
                   <h2 style={{ margin: 0, fontWeight: 900 }}>🎫 BOOKING: {bookingScanData.booking.bookingCode}</h2>
                   <span style={{ background: 'var(--primary-teal)', color: '#fff', padding: '4px 12px', borderRadius: '20px', fontSize: '12px', fontWeight: 'bold' }}>
                     NHIỀU VÉ ({bookingScanData.tickets.length} GHẾ)
@@ -506,7 +506,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                 </div>
 
                 <h4 style={{ fontWeight: 800, marginBottom: '12px' }}>DANH SÁCH GHẾ CẦN CHECK-IN:</h4>
-                <div style={{ border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', overflow: 'hidden', marginBottom: '20px' }}>
+                <div style={{ border: '1px solid #eee', borderRadius: '6px', overflow: 'hidden', marginBottom: '20px' }}>
                   <table className="admin-table" style={{ margin: 0 }}>
                     <thead>
                       <tr>
@@ -520,7 +520,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                       {bookingScanData.tickets.map(t => {
                         const isChecked = t.status === 'checked_in' || t.status === 'used';
                         return (
-                          <tr key={t.ticketCode} style={{ background: isChecked ? 'rgba(255, 255, 255, 0.01)' : 'rgba(255, 255, 255, 0.03)' }}>
+                          <tr key={t.ticketCode} style={{ background: isChecked ? '#f9f9f9' : '#fff' }}>
                             <td>
                               <input 
                                 type="checkbox"
@@ -580,8 +580,8 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
 
             {/* SCREEN 3: Traditional Search & Phone lookup (collapsible for backup) */}
             {!qrVerifyResult && !isBookingScan && (
-              <div style={{ border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', background: 'var(--bg-card)', padding: '24px' }}>
-                <h3 style={{ fontWeight: 800, margin: '0 0 15px' }}>📞 TÌM KIẾM THỦ CÔNG (SĐT / MÃ ĐẶT VÉ CỦU KHÁCH)</h3>
+              <div style={{ border: '1px solid #ddd', borderRadius: '6px', background: '#fff', padding: '24px' }}>
+                <h3 style={{ fontWeight: 800, margin: '0 0 15px' }}>📞 TÌM KIẾM THỦ CÔNG (SĐT / MÃ ĐẶT VÉ CŨ)</h3>
                 <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '20px' }}>
                   <input 
                     placeholder="Nhập SĐT khách hàng hoặc mã booking để tra cứu chi tiết..." 
@@ -589,32 +589,32 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                     onChange={e => setStaffLookupCode(e.target.value)} 
                     style={{ flexGrow: 1 }}
                   />
-                  <button className="btn" style={{ background: '#333', color: '#fff' }} onClick={() => lookupStaffTickets()}>
+                  <button className="btn" style={{ background: '#555', color: '#fff' }} onClick={() => lookupStaffTickets()}>
                     TRA CỨU LỊCH SỬ VÉ
                   </button>
                 </div>
 
                 {/* Multiple Results Switcher */}
                 {lookupResults.length > 1 && (
-                  <div style={{ background: 'rgba(243, 156, 18, 0.05)', border: '1px solid rgba(243, 156, 18, 0.3)', borderRadius: '8px', padding: '16px', marginBottom: '24px' }}>
-                    <h4 style={{ fontWeight: 800, color: '#f39c12', marginBottom: '10px' }}>
+                  <div style={{ background: '#fff', border: '1px solid #ffcc00', borderRadius: '6px', padding: '16px', marginBottom: '24px' }}>
+                    <h4 style={{ fontWeight: 800, color: '#b7791f', marginBottom: '10px' }}>
                       ⚠️ Tìm thấy {lookupResults.length} giao dịch đặt vé dưới Số điện thoại này:
                     </h4>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                       {lookupResults.map(res => (
                         <div 
-                           key={res.booking.id} 
-                           onClick={() => selectBookingResult(res)}
-                           style={{ 
-                             border: staffActiveBooking?.id === res.booking.id ? '2px solid var(--primary-teal)' : '1px solid rgba(255, 255, 255, 0.05)', 
-                             padding: '10px 14px', 
-                             borderRadius: '8px', 
-                             cursor: 'pointer',
-                             background: staffActiveBooking?.id === res.booking.id ? 'rgba(0, 173, 181, 0.05)' : 'rgba(255, 255, 255, 0.02)',
-                             display: 'flex',
-                             justifyContent: 'space-between',
-                             alignItems: 'center'
-                           }}
+                          key={res.booking.id} 
+                          onClick={() => selectBookingResult(res)}
+                          style={{ 
+                            border: staffActiveBooking?.id === res.booking.id ? '2px solid var(--primary-teal)' : '1px solid #ddd', 
+                            padding: '10px 14px', 
+                            borderRadius: '4px', 
+                            cursor: 'pointer',
+                            background: staffActiveBooking?.id === res.booking.id ? '#f0fcfb' : '#fafafa',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center'
+                          }}
                         >
                           <div>
                             <b>{res.booking.id}</b> - {res.booking.movieTitle}<br/>
@@ -623,7 +623,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                             </span>
                           </div>
                           <div>
-                            <span style={{ fontSize: '12px', background: '#333', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold', color: '#fff' }}>
+                            <span style={{ fontSize: '12px', background: '#eee', padding: '3px 8px', borderRadius: '4px', fontWeight: 'bold' }}>
                               {res.booking.seats.length} ghế
                             </span>
                           </div>
@@ -634,8 +634,8 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                 )}
 
                 {staffActiveBooking && (
-                  <div className="ticket-info-display" style={{ border: '1px solid rgba(255, 255, 255, 0.05)', padding: '20px', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.02)' }}>
-                    <h4 style={{ fontWeight: 900, borderBottom: '1px solid rgba(255, 255, 255, 0.05)', paddingBottom: '10px', marginBottom: '14px' }}>
+                  <div className="ticket-info-display" style={{ border: '1px solid #eee', padding: '20px', borderRadius: '6px', background: '#fcfcfc' }}>
+                    <h4 style={{ fontWeight: 900, borderBottom: '1px solid #eee', paddingBottom: '10px', marginBottom: '14px' }}>
                       LỊCH SỬ ĐẶT VÉ PHIM (MÃ: {staffActiveBooking.id})
                     </h4>
                     <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
@@ -700,7 +700,7 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
             <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>🎟 QUẦY BÁN VÉ TẠI RẠP</h1>
             <p className="muted" style={{ marginBottom: '24px' }}>Bán vé và thu tiền mặt trực tiếp từ khách hàng.</p>
 
-            <div className="admin-form-grid" style={{ marginBottom: '30px', background: 'var(--bg-card)', padding: '24px', border: '1px solid rgba(15, 23, 42, 0.05)', borderRadius: '8px' }}>
+            <div className="admin-form-grid" style={{ marginBottom: '30px', background: '#fff', padding: '24px', border: '1px solid #ddd', borderRadius: '4px' }}>
               <div className="form-group">
                 <label>Chọn Phim Đang Chiếu</label>
                 <select value={staffMovieId} onChange={e => setStaffMovieId(e.target.value)}>
@@ -723,14 +723,14 @@ export default function StaffDashboard({ user, handleLogout, nowMovies, dates, s
                 </select>
               </div>
               <div className="form-group" style={{ justifyContent: 'flex-end' }}>
-                <button className="btn" style={{ background: 'var(--primary-teal)', color: '#fff', height: '46px' }} onClick={openCounterSalesGrid}>
+                <button className="btn" style={{ background: '#111', color: '#fff', height: '46px' }} onClick={openCounterSalesGrid}>
                   LOAD SƠ ĐỒ GHẾ TRỐNG
                 </button>
               </div>
             </div>
 
             {staffMovieId && staffDate && staffTime && (
-              <div style={{ background: 'var(--bg-card)', padding: '30px', border: '1px solid rgba(15, 23, 42, 0.05)', borderRadius: '8px' }}>
+              <div style={{ background: '#fff', padding: '30px', border: '1px solid #ddd', borderRadius: '4px' }}>
                 <div className="screen">MÀN HÌNH QUẦY SOÁT</div>
                 <div className="seats" style={{ maxWidth: '600px', margin: '0 auto 30px' }}>
                   {allSeats.map(seat => {

@@ -21,7 +21,7 @@ const {
 const bcrypt = require('bcryptjs');
 
 // 1. Define 10 Latest Movies (now showing) and 2 upcoming movies
-const initialMovies = [
+const baseSeedMovies = [
   {
     title: 'TẠM BIỆT GOHAN',
     genre: 'Hoạt hình, Hành động, Viễn tưởng',
@@ -143,6 +143,66 @@ const initialMovies = [
     poster: 'https://images.unsplash.com/photo-1509198397868-475647b2a1e5?w=500&auto=format&fit=crop&q=60'
   }
 ];
+
+const movieTemplates = [
+  { title: 'Kẻ Hủy Diệt', genre: 'Hành động, Viễn tưởng', age: 'T16', desc: 'Trận chiến sinh tử giữa nhân loại và thế lực máy móc thông minh.' },
+  { title: 'Chiến Binh Ánh Sáng', genre: 'Phiêu lưu, Giả tưởng', age: 'T13', desc: 'Hành trình tìm kiếm thanh gươm huyền thoại bảo vệ vương quốc.' },
+  { title: 'Tình Yêu Không Lối Thoát', genre: 'Tình cảm, Tâm lý', age: 'T16', desc: 'Câu chuyện tình đầy nước mắt giữa hai tâm hồn cô đơn.' },
+  { title: 'Cơn Ác Mộng Đêm Hè', genre: 'Kinh dị, Giật gân', age: 'T18', desc: 'Nhóm bạn trẻ đối diện với thế lực tà ác trong ngôi nhà gỗ trong rừng.' },
+  { title: 'Thám Tử Lừng Danh', genre: 'Hình sự, Trinh thám', age: 'T13', desc: 'Vụ án mạng bí ẩn trong lâu đài cổ kính được thám tử phá giải.' },
+  { title: 'Cuộc Chiến Sinh Tử', genre: 'Hành động, Phiêu lưu', age: 'T18', desc: 'Đấu trường khắc nghiệt nơi chỉ có một người được quyền sống sót.' },
+  { title: 'Gia Đình Siêu Quậy', genre: 'Hài, Gia đình', age: 'P', desc: 'Những tình huống dở khóc dở cười của gia đình ba thế hệ.' },
+  { title: 'Vương Quốc Kỳ Diệu', genre: 'Hoạt hình, Gia đình', age: 'P', desc: 'Thế giới đầy sắc màu kỳ lạ nơi các đồ vật biết nói chuyện.' },
+  { title: 'Dòng Sông Ký Ức', genre: 'Tâm lý, Chính kịch', age: 'K', desc: 'Hành trình vượt qua nỗi mất mát lớn lao của một gia đình nhỏ.' },
+  { title: 'Hành Tinh Bất Định', genre: 'Viễn tưởng, Phiêu lưu', age: 'T13', desc: 'Cuộc thám hiểm hành tinh mới nằm ngoài hệ mặt trời của phi hành đoàn.' },
+  { title: 'Võ Sĩ Cuối Cùng', genre: 'Hành động, Cổ trang', age: 'T16', desc: 'Sự phục quốc vĩ đại của người cận vệ hoàng gia duy nhất sống sót.' },
+  { title: 'Mùa Hè Năm Ấy', genre: 'Lãng mạn, Học đường', age: 'T13', desc: 'Ký ức ngọt ngào và thơ mộng của nhóm học sinh năm cuối cấp.' },
+  { title: 'Đèn Khuya', genre: 'Kinh dị, Bí ẩn', age: 'T18', desc: 'Truyền thuyết đô thị đáng sợ về chiếc đèn dầu lúc nửa đêm.' },
+  { title: 'Mật Mã Tối Cao', genre: 'Hành động, Giật gân', age: 'T16', desc: 'Cuộc rượt đuổi nghẹt thở nhằm ngăn chặn quả bom hạt nhân kích hoạt.' },
+  { title: 'Bóng Đêm Luân Hồi', genre: 'Kinh dị, Tâm linh', age: 'T16', desc: 'Oán khí ngàn năm quay lại đòi nợ máu dòng tộc giàu sang.' },
+  { title: 'Bay Cao Cùng Ước Mơ', genre: 'Tài liệu, Truyền cảm hứng', age: 'P', desc: 'Hành trình chinh phục ước mơ âm nhạc của các trẻ em nghèo.' },
+  { title: 'Quái Vật Đầm Lầy', genre: 'Kinh dị, Khoa học viễn tưởng', age: 'T16', desc: 'Thí nghiệm sinh học thất bại giải phóng sinh vật khổng lồ tàn phá thành phố.' },
+  { title: 'Trò Chơi Trí Tuệ', genre: 'Tâm lý, Giật gân', age: 'T16', desc: 'Cuộc đấu trí đỉnh cao giữa giáo sư toán học và tên tội phạm thiên tài.' },
+  { title: 'Vết Sẹo Thời Gian', genre: 'Chiến tranh, Tâm lý', age: 'T18', desc: 'Góc khuất chiến tranh qua lời kể của người lính già xuất ngũ.' },
+  { title: 'Siêu Cấp Thú Cưng', genre: 'Hoạt hình, Hài', age: 'K', desc: 'Biệt đội thú cưng siêu năng lực giải cứu người chủ yêu quý.' }
+];
+
+const posterIds = [
+  'photo-1485846234645-a62644f84728', 'photo-1536440136628-849c177e76a1', 'photo-1478720568477-152d9b164e26',
+  'photo-1509281373149-e957c6296406', 'photo-1517604931442-7e0c8ed2963c', 'photo-1489599849927-2ee91cede3ba',
+  'photo-1505635339347-29141f230000', 'photo-1518709268805-4e9042af9f23', 'photo-1526374965328-7f61d4dc18c5',
+  'photo-1534447677768-be436bb09401', 'photo-1563089145-599997674d42', 'photo-1607604276583-eef5d076aa5f',
+  'photo-1542204172-e7052809f852', 'photo-1535498730771-e735b998cd64', 'photo-1497124401559-3e75ec2e794a',
+  'photo-1504701954957-2390f80619b4', 'photo-1500462918020-f16758657ce9', 'photo-1501183007986-d0d080b147f9',
+  'photo-1513151233558-d860c5398176', 'photo-1518173946687-a4c8a3833927'
+];
+
+const generatedMovies = [];
+const baseSeedMoviesCount = baseSeedMovies.length;
+for (let i = 0; i < 200; i++) {
+  if (i < baseSeedMoviesCount) {
+    generatedMovies.push({
+      id: i + 1,
+      ...baseSeedMovies[i]
+    });
+  } else {
+    const template = movieTemplates[(i - baseSeedMoviesCount) % movieTemplates.length];
+    const iteration = Math.floor((i - baseSeedMoviesCount) / movieTemplates.length) + 2;
+    const status = (i % 8 === 0) ? 'soon' : 'now'; // 87.5% now playing, 12.5% coming soon
+    generatedMovies.push({
+      id: i + 1,
+      title: `${template.title.toUpperCase()} ${iteration}`,
+      genre: template.genre,
+      age: template.age,
+      duration: `${95 + (i % 5) * 10} phút`,
+      status: status,
+      desc: `${template.desc} Phần phim thứ ${iteration} hứa hẹn mang lại những cảm xúc bùng nổ vượt trội.`,
+      room: status === 'soon' ? 'Sắp cập nhật' : `Phòng chiếu 0${(i % 5) + 1}`,
+      poster: `https://images.unsplash.com/${posterIds[i % posterIds.length]}?w=500&auto=format&fit=crop&q=60`
+    });
+  }
+}
+const initialMovies = generatedMovies;
 
 const initialProducts = [
   { id: 'c1', name: 'Combo Metiz Single', category: 'combos', price: 75000, desc: '1 bắp lớn vị ngọt/mặn + 1 nước ngọt size lớn tùy chọn.', img: 'https://images.unsplash.com/photo-1578849278619-e73505e9610f?w=400&auto=format&fit=crop&q=60' },

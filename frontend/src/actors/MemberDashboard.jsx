@@ -56,9 +56,9 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
             }
           }
           .member-card-wrapper {
-            background: var(--bg-card);
-            border: 1px solid rgba(15, 23, 42, 0.05);
-            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             padding: 24px;
             box-shadow: var(--card-shadow);
             display: flex;
@@ -106,35 +106,33 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
             align-items: flex-end;
           }
           .dashboard-tabs-container {
-            background: var(--bg-card);
-            border: 1px solid rgba(15, 23, 42, 0.05);
-            border-radius: 12px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
             box-shadow: var(--card-shadow);
             overflow: hidden;
           }
           .dashboard-tabs-header {
             display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            background: rgba(15, 23, 42, 0.02);
-            border-bottom: 1px solid rgba(15, 23, 42, 0.05);
+            grid-template-columns: repeat(4, 1fr);
+            background: #f5f6fa;
+            border-bottom: 1px solid #ddd;
           }
           .dashboard-tab-btn {
             border: none;
             background: transparent;
             padding: 15px 10px;
-            font-size: 11px;
+            font-size: 13px;
             font-weight: 800;
             cursor: pointer;
             text-align: center;
-            color: var(--text-muted);
+            color: #555;
             transition: all 0.2s;
             border-bottom: 3px solid transparent;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
           }
           .dashboard-tab-btn.active {
-            background: rgba(15, 23, 42, 0.03);
-            color: var(--text-dark);
+            background: #fff;
+            color: #111;
             border-bottom-color: var(--primary-teal);
           }
           .dashboard-tabs-content {
@@ -158,32 +156,16 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
           .profile-field-group label {
             font-size: 11px;
             font-weight: 800;
-            color: var(--text-muted);
+            color: #888;
             text-transform: uppercase;
           }
           .profile-field-group input {
             padding: 12px;
-            border: 1px solid rgba(15, 23, 42, 0.1);
-            border-radius: 8px;
-            background: rgba(15, 23, 42, 0.02);
-            color: var(--text-dark);
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: #fafafa;
+            color: #333;
             cursor: not-allowed;
-          }
-          .voucher-card {
-            background: rgba(15, 23, 42, 0.02);
-            border: 1px solid rgba(15, 23, 42, 0.05);
-            border-radius: 8px;
-            padding: 16px;
-            position: relative;
-          }
-          .voucher-card::before {
-            content: '';
-            position: absolute;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            width: 4px;
-            background: var(--primary-teal);
           }
         `}} />
 
@@ -211,10 +193,10 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
             </div>
           </div>
 
-          <div style={{ borderTop: '1px solid rgba(15, 23, 42, 0.05)', paddingTop: '15px' }}>
-            <h4 style={{ fontSize: '12px', fontWeight: 800, color: 'var(--text-dark)', marginBottom: '10px' }}>TIẾN TRÌNH HẠNG THẺ</h4>
+          <div style={{ borderTop: '1px solid #eee', paddingTop: '15px' }}>
+            <h4 style={{ fontSize: '12px', fontWeight: 800, color: '#333', marginBottom: '10px' }}>TIẾN TRÌNH HẠNG THẺ</h4>
             
-            <div style={{ position: 'relative', height: '6px', background: 'rgba(15, 23, 42, 0.1)', borderRadius: '3px', margin: '20px 0 10px' }}>
+            <div style={{ position: 'relative', height: '6px', background: '#eee', borderRadius: '3px', margin: '20px 0 10px' }}>
               <div style={{ 
                 position: 'absolute', 
                 left: 0, 
@@ -225,25 +207,25 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
                 borderRadius: '3px' 
               }}></div>
               
-              <div style={{ position: 'absolute', left: '33%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary-teal)', border: '2px solid var(--bg-card)' }}></div>
-              <div style={{ position: 'absolute', left: '66%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: isGold || isDiamond ? 'var(--primary-teal)' : 'rgba(15, 23, 42, 0.1)', border: '2px solid var(--bg-card)' }}></div>
-              <div style={{ position: 'absolute', left: '100%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: isDiamond ? 'var(--primary-teal)' : 'rgba(15, 23, 42, 0.1)', border: '2px solid var(--bg-card)' }}></div>
+              <div style={{ position: 'absolute', left: '33%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: 'var(--primary-teal)', border: '2px solid #fff' }}></div>
+              <div style={{ position: 'absolute', left: '66%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: isGold || isDiamond ? 'var(--primary-teal)' : '#eee', border: '2px solid #fff' }}></div>
+              <div style={{ position: 'absolute', left: '100%', top: '50%', transform: 'translate(-50%, -50%)', width: '12px', height: '12px', borderRadius: '50%', background: isDiamond ? 'var(--primary-teal)' : '#eee', border: '2px solid #fff' }}></div>
             </div>
 
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: '800', color: 'var(--text-muted)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '10px', fontWeight: '800', color: '#888' }}>
               <span>M-STAR</span>
               <span>M-GOLD</span>
               <span>M-DIAMOND</span>
             </div>
 
-            <div style={{ marginTop: '15px', background: 'rgba(15, 23, 42, 0.02)', padding: '10px', borderRadius: '8px', fontSize: '11px', color: 'var(--text-muted)', border: '1px dashed rgba(15, 23, 42, 0.1)', textAlign: 'center' }}>
-              Tổng chi tiêu lũy kế: <b style={{ color: 'var(--text-dark)' }}>{user.totalSpending.toLocaleString('vi-VN')}đ</b>
+            <div style={{ marginTop: '15px', background: '#fafafa', padding: '10px', borderRadius: '4px', fontSize: '11px', color: '#666', border: '1px dashed #ddd', textAlign: 'center' }}>
+              Tổng chi tiêu lũy kế: <b>{user.totalSpending.toLocaleString('vi-VN')}đ</b>
             </div>
           </div>
         </div>
 
         <div className="dashboard-tabs-container">
-          <div className="dashboard-tabs-header">
+          <div className="dashboard-tabs-header" style={{ gridTemplateColumns: 'repeat(5, 1fr)' }}>
             <button className={`dashboard-tab-btn ${activeTab === 'profile' ? 'active' : ''}`} onClick={() => setActiveTab('profile')}>
               👤 THÔNG TIN
             </button>
@@ -264,38 +246,38 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
           <div className="dashboard-tabs-content">
             {activeTab === 'profile' && (
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: '900', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px', marginBottom: '20px', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: '#111' }}>
                   THÔNG TIN TÀI KHOẢN HỘI VIÊN
                 </h3>
                 
                 <div className="profile-form-grid">
                   <div className="profile-field-group">
                     <label>Họ và Tên</label>
-                    <input value={user.fullName} readOnly />
+                    <input value={user.fullName} readOnly style={{ border: '1px solid #ddd' }} />
                   </div>
                   <div className="profile-field-group">
                     <label>Địa Chỉ Email</label>
-                    <input value={user.email} readOnly />
+                    <input value={user.email} readOnly style={{ border: '1px solid #ddd' }} />
                   </div>
                   <div className="profile-field-group">
                     <label>Số Điện Thoại</label>
-                    <input value={user.phone || 'Chưa cập nhật'} readOnly />
+                    <input value={user.phone || 'Chưa cập nhật'} readOnly style={{ border: '1px solid #ddd' }} />
                   </div>
                   <div className="profile-field-group">
                     <label>Ngày Sinh</label>
-                    <input value="19/04/2004" readOnly />
+                    <input value="19/04/2004" readOnly style={{ border: '1px solid #ddd' }} />
                   </div>
                   <div className="profile-field-group">
                     <label>CCCD / Hộ Chiếu</label>
-                    <input value="54204006960" readOnly />
+                    <input value="54204006960" readOnly style={{ border: '1px solid #ddd' }} />
                   </div>
                   <div className="profile-field-group">
                     <label>Giới Tính</label>
-                    <input value="Nam" readOnly />
+                    <input value="Nam" readOnly style={{ border: '1px solid #ddd' }} />
                   </div>
                 </div>
 
-                <div style={{ marginTop: '20px', background: 'rgba(245, 158, 11, 0.1)', border: '1px solid rgba(245, 158, 11, 0.3)', padding: '12px 16px', borderRadius: '8px', color: '#f59e0b', fontSize: '12px', fontWeight: '700' }}>
+                <div style={{ marginTop: '20px', background: '#fff9db', border: '1px solid #ffe066', padding: '12px 16px', borderRadius: '4px', color: '#856404', fontSize: '12px', fontWeight: '700' }}>
                   ⚠️ Liên hệ hotline <b>0236 3630 689</b> hoặc tới quầy CSKH của rạp Metiz để được hỗ trợ thay đổi thông tin cá nhân.
                 </div>
 
@@ -309,27 +291,27 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
 
             {activeTab === 'card-rules' && (
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: '900', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px', marginBottom: '20px', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: '#111' }}>
                   HẠNG THẺ & QUYỀN LỢI ƯU ĐÃI
                 </h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                  <div style={{ padding: '15px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.01)' }}>
-                    <h4 style={{ fontWeight: '800', color: '#00adb5' }}>1. Hạng Thẻ Standard</h4>
-                    <p className="muted" style={{ fontSize: '13px', marginTop: '5px', color: 'var(--text-muted)' }}>
+                  <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '6px', background: !isGold && !isDiamond ? '#f8f9fa' : 'transparent' }}>
+                    <h4 style={{ fontWeight: '800', color: '#0f4c81' }}>1. Hạng Thẻ Standard</h4>
+                    <p className="muted" style={{ fontSize: '13px', marginTop: '5px' }}>
                       • Tích lũy <b>5%</b> giá trị giao dịch mua vé & bắp nước tại rạp online.<br/>
                       • Đạt hạng Standard ngay sau khi hoàn tất đăng ký tài khoản.
                     </p>
                   </div>
-                  <div style={{ padding: '15px', border: '1px solid rgba(212, 175, 55, 0.3)', borderRadius: '8px', background: 'rgba(212, 175, 55, 0.05)' }}>
-                    <h4 style={{ fontWeight: '800', color: '#d4af37' }}>2. Hạng Thẻ VIP Gold (Đạt mốc từ 200 điểm)</h4>
-                    <p className="muted" style={{ fontSize: '13px', marginTop: '5px', color: 'var(--text-muted)' }}>
+                  <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '6px', background: isGold ? '#fffdf5' : 'transparent', borderColor: isGold ? '#d4af37' : '#ddd' }}>
+                    <h4 style={{ fontWeight: '800', color: '#aa7c11' }}>2. Hạng Thẻ VIP Gold (Đạt mốc từ 200 điểm)</h4>
+                    <p className="muted" style={{ fontSize: '13px', marginTop: '5px' }}>
                       • Tích lũy <b>7%</b> giá trị giao dịch mua vé & bắp nước tại rạp online.<br/>
                       • Tặng 1 phần bắp ngọt size lớn miễn phí vào tuần lễ sinh nhật.
                     </p>
                   </div>
-                  <div style={{ padding: '15px', border: '1px solid rgba(255, 255, 255, 0.1)', borderRadius: '8px', background: 'rgba(255, 255, 255, 0.02)' }}>
-                    <h4 style={{ fontWeight: '800', color: '#fff' }}>3. Hạng Thẻ VVIP Diamond (Đạt mốc từ 500 điểm)</h4>
-                    <p className="muted" style={{ fontSize: '13px', marginTop: '5px', color: 'var(--text-muted)' }}>
+                  <div style={{ padding: '15px', border: '1px solid #ddd', borderRadius: '6px', background: isDiamond ? '#fafafa' : 'transparent', borderColor: isDiamond ? '#333' : '#ddd' }}>
+                    <h4 style={{ fontWeight: '800', color: '#333' }}>3. Hạng Thẻ VVIP Diamond (Đạt mốc từ 500 điểm)</h4>
+                    <p className="muted" style={{ fontSize: '13px', marginTop: '5px' }}>
                       • Tích lũy <b>10%</b> giá trị giao dịch mua vé & bắp nước tại rạp online.<br/>
                       • Tặng 1 combo bắp nước lớn + 2 vé xem phim 2D miễn phí dịp sinh nhật.
                     </p>
@@ -340,11 +322,11 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
 
             {activeTab === 'vouchers' && (
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: '900', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px', marginBottom: '20px', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: '#111' }}>
                   KHO VOUCHER KHUYẾN MÃI CỦA BẠN
                 </h3>
                 {myVouchers.length === 0 ? (
-                  <p className="muted" style={{ textAlign: 'center', padding: '30px 0', color: 'var(--text-muted)' }}>
+                  <p className="muted" style={{ textAlign: 'center', padding: '30px 0' }}>
                     Hiện bạn chưa sở hữu mã giảm giá nào. Hãy tích lũy chi tiêu để nhận voucher tri ân nhé!
                   </p>
                 ) : (
@@ -355,20 +337,34 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
                           grid-template-columns: 1fr !important;
                         }
                       }
+                      .voucher-card {
+                        background: #fff;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 8px;
+                        padding: 16px;
+                                             .voucher-card::before {
+                        content: '';
+                        position: absolute;
+                        left: 0;
+                        top: 0;
+                        bottom: 0;
+                        width: 4px;
+                        background: var(--primary-teal);
+                      }
                     `}} />
                     {myVouchers.map(v => (
                       <div className="voucher-card" key={v.id}>
                         <div>
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span style={{ fontSize: '13px', fontWeight: '900', color: 'var(--primary-teal)', background: 'rgba(0, 173, 181, 0.1)', padding: '4px 8px', borderRadius: '4px' }}>
+                            <span style={{ fontSize: '14px', fontWeight: '900', color: 'var(--primary-teal)', background: '#e0f2fe', padding: '4px 8px', borderRadius: '4px' }}>
                               {v.code}
                             </span>
-                            <span style={{ fontSize: '11px', color: 'var(--text-muted)' }}>Hạn: {v.endDate}</span>
+                            <span style={{ fontSize: '11px', color: '#64748b' }}>Hạn: {v.endDate}</span>
                           </div>
-                          <h4 style={{ fontWeight: '800', marginTop: '10px', fontSize: '14px', color: '#fff' }}>{v.name}</h4>
-                          <p style={{ fontSize: '12px', color: 'var(--text-muted)', marginTop: '4px', lineHeight: '1.4' }}>{v.description}</p>
+                          <h4 style={{ fontWeight: '800', marginTop: '10px', fontSize: '14px', color: '#1e293b' }}>{v.name}</h4>
+                          <p style={{ fontSize: '12px', color: '#64748b', marginTop: '4px', lineHeight: '1.4' }}>{v.description}</p>
                         </div>
-                        <div style={{ marginTop: '12px', borderTop: '1px dashed rgba(255, 255, 255, 0.1)', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: 'var(--text-muted)' }}>
+                        <div style={{ marginTop: '12px', borderTop: '1px dashed #e2e8f0', paddingTop: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '11px', color: '#64748b' }}>
                           <span>Đơn tối thiểu: <b>{money(v.minOrderAmount)}</b></span>
                           <span>Giảm: <b>{v.discountType === 'percent' ? `${v.discountValue}%` : money(v.discountValue)}</b></span>
                         </div>
@@ -381,10 +377,10 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
 
             {activeTab === 'policies' && (
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: '900', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px', marginBottom: '20px', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: '#111' }}>
                   CHÍNH SÁCH ĐIỀU KHOẢN THÀNH VIÊN
                 </h3>
-                <p className="muted" style={{ fontSize: '13px', lineHeight: '1.8', color: 'var(--text-muted)' }}>
+                <p className="muted" style={{ fontSize: '13px', lineHeight: '1.8' }}>
                   • Điểm tích lũy thành viên chỉ áp dụng đối với các giao dịch mua vé hợp lệ trên website hoặc tại quầy bán vé Metiz Cinema.<br/>
                   • Điểm tích lũy không có giá trị quy đổi thành tiền mặt, nhưng có thể dùng để đổi vé xem phim, combo bắp nước hoặc quà lưu niệm tại rạp.<br/>
                   • Thẻ thành viên là tài sản cá nhân, không được cho mượn hoặc chuyển nhượng dưới mọi hình thức.<br/>
@@ -395,7 +391,7 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
 
             {activeTab === 'transactions' && (
               <div>
-                <h3 style={{ fontSize: '15px', fontWeight: '900', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: '10px', marginBottom: '20px', color: '#fff', textTransform: 'uppercase', letterSpacing: '0.05em' }}>
+                <h3 style={{ fontSize: '16px', fontWeight: '900', borderBottom: '2px solid #eee', paddingBottom: '10px', marginBottom: '20px', color: '#111' }}>
                   LỊCH SỬ GIAO DỊCH & TÍCH ĐIỂM
                 </h3>
                 
@@ -410,19 +406,19 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
                   <div>
                     <h4 style={{ fontWeight: '800', marginBottom: '10px', fontSize: '13px', color: 'var(--primary-teal)' }}>🎟️ LỊCH SỬ ĐẶT VÉ</h4>
                     {bookingsHistory.length === 0 ? (
-                      <p className="muted" style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Bạn chưa đặt vé nào.</p>
+                      <p className="muted" style={{ fontSize: '12px' }}>Bạn chưa đặt vé nào.</p>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {bookingsHistory.map((item) => (
-                          <div key={item.id} style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px', background: 'rgba(255,255,255,0.02)' }}>
+                          <div key={item.id} style={{ border: '1px solid #eee', borderRadius: '4px', padding: '10px', background: '#fafafa' }}>
                             <span style={{ fontSize: '9px', background: 'var(--primary-teal)', color: '#fff', padding: '2px 4px', borderRadius: '3px', fontWeight: '800' }}>
                               #{item.id}
                             </span>
-                            <h5 style={{ fontWeight: '800', margin: '6px 0 2px', fontSize: '13.5px', color: '#fff' }}>{item.movieTitle}</h5>
-                            <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>
+                            <h5 style={{ fontWeight: '800', margin: '4px 0 2px', fontSize: '13px' }}>{item.movieTitle}</h5>
+                            <p style={{ fontSize: '11px', color: '#666', margin: 0 }}>
                               🎬 {item.time} ({new Date(item.date).toLocaleDateString('vi-VN')}) • Ghế: {item.seats.join(', ')}
                             </p>
-                            <b style={{ color: '#ef4444', fontSize: '13px', display: 'block', marginTop: '6px' }}>{money(item.total)}</b>
+                            <b style={{ color: '#d62246', fontSize: '13px', display: 'block', marginTop: '4px' }}>{money(item.total)}</b>
                           </div>
                         ))}
                       </div>
@@ -432,11 +428,11 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
                   <div>
                     <h4 style={{ fontWeight: '800', marginBottom: '10px', fontSize: '13px', color: '#f39c12' }}>🪙 LỊCH SỬ ĐIỂM TÍCH LŨY</h4>
                     {pointTransactions.length === 0 ? (
-                      <p className="muted" style={{ fontSize: '12px', color: 'var(--text-muted)' }}>Chưa có giao dịch tích lũy điểm.</p>
+                      <p className="muted" style={{ fontSize: '12px' }}>Chưa có giao dịch tích lũy điểm.</p>
                     ) : (
                       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
                         {pointTransactions.map((tx) => (
-                          <div key={tx.id} style={{ border: '1px solid rgba(255,255,255,0.05)', borderRadius: '8px', padding: '12px', background: 'rgba(255,255,255,0.02)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                          <div key={tx.id} style={{ border: '1px solid #eee', borderRadius: '4px', padding: '10px', background: '#fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                             <div>
                               <span style={{
                                 fontSize: '9px',
@@ -448,8 +444,8 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
                               }}>
                                 {tx.transactionType === 'earn' ? 'TÍCH ĐIỂM' : 'TIÊU ĐIỂM'}
                               </span>
-                              <p style={{ fontSize: '12px', margin: '4px 0 2px', color: '#fff' }}>{tx.description}</p>
-                              <span style={{ fontSize: '10px', color: 'var(--text-muted)' }}>{new Date(tx.createdAt).toLocaleString('vi-VN')}</span>
+                              <p style={{ fontSize: '12px', margin: '4px 0 2px', color: '#333' }}>{tx.description}</p>
+                              <span style={{ fontSize: '10px', color: '#888' }}>{new Date(tx.createdAt).toLocaleString('vi-VN')}</span>
                             </div>
                             <b style={{ color: tx.transactionType === 'earn' ? '#2ecc71' : '#e74c3c', fontSize: '14px' }}>
                               {tx.transactionType === 'earn' ? `+${tx.points}` : `-${tx.points}`}
@@ -469,7 +465,7 @@ export default function MemberDashboard({ user: initialUser, bookingsHistory, on
       <div style={{ marginTop: '30px', textAlign: 'center' }}>
         <button 
           className="btn" 
-          style={{ background: '#ef4444', color: '#fff', width: 'auto', padding: '12px 40px', boxShadow: '0 4px 12px rgba(239, 68, 68, 0.25)' }} 
+          style={{ background: '#e74c3c', color: '#fff', width: 'auto', padding: '12px 40px' }} 
           onClick={onLogout}
         >
           🚪 ĐĂNG XUẤT TÀI KHOẢN
