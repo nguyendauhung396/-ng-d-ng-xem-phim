@@ -113,7 +113,7 @@ export default function Home({
           ))}
         </div>
         <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <button className="btn" style={{ background: '#222', color: '#fff', padding: '12px 30px', borderRadius: '4px' }} onClick={() => navigateTo('/phim.html')}>
+          <button className="btn" onClick={() => navigateTo('/phim.html')}>
             XEM TOÀN BỘ PHIM
           </button>
         </div>
@@ -143,7 +143,7 @@ export default function Home({
           ))}
         </div>
         <div style={{ textAlign: 'center', marginTop: '40px' }}>
-          <button className="btn" style={{ background: '#222', color: '#fff', padding: '12px 30px', borderRadius: '4px' }} onClick={() => navigateTo('/tin-va-khuyen-mai.html')}>
+          <button className="btn" onClick={() => navigateTo('/tin-va-khuyen-mai.html')}>
             TẤT CẢ TIN TỨC & KHUYẾN MÃI
           </button>
         </div>

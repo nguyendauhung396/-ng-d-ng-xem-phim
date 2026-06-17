@@ -427,7 +427,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                 <span>TỔNG VÉ ĐÃ BÁN</span>
                 <h2>{adminRevenue.summary.totalBookings} đơn</h2>
               </div>
-              <div className="metric-card" style={{ background: '#e8f8f5' }}>
+              <div className="metric-card" style={{ background: 'var(--bg-card)' }}>
                 <span>THÀNH VIÊN ĐĂNG KÝ</span>
                 <h2 style={{ color: 'var(--primary-teal)' }}>{adminRevenue.summary.totalMembers} hội viên</h2>
               </div>
@@ -450,7 +450,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                       <td><b style={{ color: '#d62246' }}>{money(sales.revenue)}</b></td>
                       <td>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ flexGrow: 1, height: '8px', background: '#eee', borderRadius: '4px', overflow: 'hidden' }}>
+                          <div style={{ flexGrow: 1, height: '8px', background: 'rgba(255, 255, 255, 0.05)', borderRadius: '4px', overflow: 'hidden' }}>
                             <div style={{ height: '100%', background: 'var(--primary-teal)', width: `${Math.min(100, (sales.revenue / (adminRevenue.summary.totalRevenue || 1)) * 100)}%` }} />
                           </div>
                           <span style={{ fontSize: '11px', fontWeight: '800' }}>
@@ -471,7 +471,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
             <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>🎬 QUẢN LÝ DANH SÁCH PHIM</h1>
             <p className="muted" style={{ marginBottom: '24px' }}>Thêm, sửa và gỡ phim tại rạp Metiz Cinema.</p>
 
-            <form onSubmit={handleAdminCreateMovie} style={{ background: '#fff', padding: '24px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '30px' }}>
+            <form onSubmit={handleAdminCreateMovie} style={{ background: 'var(--bg-card)', padding: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', marginBottom: '30px' }}>
               <h3 style={{ fontWeight: 900, marginBottom: '16px' }}>➕ THÊM PHIM MỚI</h3>
               <div className="admin-form-grid">
                 <div className="form-group">
@@ -516,7 +516,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                 <label>Mô tả ngắn</label>
                 <textarea name="desc" placeholder="Tóm tắt phim..." required style={{ height: '80px', fontFamily: 'inherit' }}></textarea>
               </div>
-              <button className="btn" style={{ background: '#111', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
+              <button className="btn" style={{ background: 'var(--primary-teal)', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
                 THÊM PHIM VÀO HỆ THỐNG
               </button>
             </form>
@@ -569,7 +569,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
             <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>📅 QUẢN LÝ LỊCH CHIẾU & SUẤT CHIẾU</h1>
             <p className="muted" style={{ marginBottom: '24px' }}>Quản lý phòng chiếu, lịch chiếu và tránh xung đột khung giờ.</p>
 
-            <form onSubmit={handleAdminCreateShowtime} style={{ background: '#fff', padding: '24px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '30px' }}>
+            <form onSubmit={handleAdminCreateShowtime} style={{ background: 'var(--bg-card)', padding: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', marginBottom: '30px' }}>
               <h3 style={{ fontWeight: 900, marginBottom: '16px' }}>➕ TẠO SUẤT CHIẾU MỚI</h3>
               <div className="admin-form-grid">
                 <div className="form-group">
@@ -594,7 +594,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                   <input name="price" type="number" defaultValue="55000" required />
                 </div>
               </div>
-              <button className="btn" style={{ background: '#111', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
+              <button className="btn" style={{ background: 'var(--primary-teal)', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
                 TẠO SUẤT CHIẾU MỚI
               </button>
             </form>
@@ -666,8 +666,8 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                       <td>{u.tier}</td>
                       <td>
                         <span style={{
-                          background: u.role === 'admin' ? '#f8d7da' : u.role === 'staff' ? '#fff3cd' : '#e8f4fd',
-                          color: u.role === 'admin' ? '#721c24' : u.role === 'staff' ? '#856404' : '#004085',
+                          background: u.role === 'admin' ? 'rgba(239, 68, 68, 0.15)' : u.role === 'staff' ? 'rgba(245, 158, 11, 0.15)' : 'rgba(59, 130, 246, 0.15)',
+                          color: u.role === 'admin' ? '#ef4444' : u.role === 'staff' ? '#f59e0b' : '#3b82f6',
                           padding: '4px 10px',
                           borderRadius: '3px',
                           fontSize: '11px',
@@ -680,7 +680,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                         <select 
                           value={u.role} 
                           onChange={e => changeUserRoleAdmin(u.id, e.target.value)}
-                          style={{ padding: '6px', border: '1px solid #ddd', borderRadius: '4px', fontSize: '12px' }}
+                          style={{ padding: '6px', border: '1px solid rgba(255, 255, 255, 0.08)', background: 'var(--bg-card)', color: '#fff', borderRadius: '4px', fontSize: '12px' }}
                         >
                           <option value="member">MEMBER (Thành viên)</option>
                           <option value="staff">STAFF (Soát vé/Quầy)</option>
@@ -709,7 +709,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                     <div>
                       <span className="audit-item-actor">{log.actor}</span>
                       <b style={{ marginLeft: '10px', color: 'var(--primary-teal)' }}>{log.action}</b>
-                      <p style={{ marginTop: '6px', color: '#555' }}>{log.details}</p>
+                      <p style={{ marginTop: '6px', color: 'var(--text-muted)' }}>{log.details}</p>
                     </div>
                     <span style={{ fontSize: '11px', color: '#888' }}>
                       {new Date(log.createdAt).toLocaleString('vi-VN')}
@@ -726,7 +726,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
             <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>🎟️ QUẢN LÝ VOUCHER KHUYẾN MÃI</h1>
             <p className="muted" style={{ marginBottom: '24px' }}>Tạo, sửa, khóa và kiểm soát các mã giảm giá trong hệ thống.</p>
 
-            <form onSubmit={handleAdminCreateVoucher} style={{ background: '#fff', padding: '24px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '30px' }}>
+            <form onSubmit={handleAdminCreateVoucher} style={{ background: 'var(--bg-card)', padding: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', marginBottom: '30px' }}>
               <h3 style={{ fontWeight: 900, marginBottom: '16px' }}>➕ TẠO VOUCHER MỚI</h3>
               <div className="admin-form-grid">
                 <div className="form-group">
@@ -773,7 +773,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                   <input name="endDate" type="date" required />
                 </div>
               </div>
-              <button className="btn" style={{ background: '#111', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
+              <button className="btn" style={{ background: 'var(--primary-teal)', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
                 PHÁT HÀNH VOUCHER
               </button>
             </form>
@@ -799,7 +799,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                       <td><b style={{ color: 'var(--primary-teal)' }}>{v.code}</b></td>
                       <td>
                         <b>{v.name}</b>
-                        <p style={{ fontSize: '11px', color: '#666', margin: 0 }}>{v.description}</p>
+                        <p style={{ fontSize: '11px', color: 'var(--text-muted)', margin: 0 }}>{v.description}</p>
                       </td>
                       <td><b>{v.discountType === 'percent' ? `${v.discountValue}%` : money(v.discountValue)}</b></td>
                       <td>{money(v.minOrderAmount)}</td>
@@ -900,35 +900,34 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
 
             {adminScanStats && (
               <div className="metrics-grid" style={{ marginBottom: '30px' }}>
-                <div className="metric-card" style={{ background: '#ebf5fb' }}>
+                <div className="metric-card">
                   <span>TỔNG VÉ ĐÃ BÁN</span>
-                  <h2 style={{ color: '#2980b9' }}>{adminScanStats.totalSold || 0} vé</h2>
+                  <h2>{adminScanStats.totalSold || 0} vé</h2>
                 </div>
-                <div className="metric-card" style={{ background: '#eefbf3' }}>
+                <div className="metric-card">
                   <span>ĐÃ VÀO PHÒNG CHIẾU</span>
-                  <h2 style={{ color: '#27ae60' }}>
+                  <h2>
                     {adminScanStats.totalCheckedIn || 0} vé ({((adminScanStats.totalCheckedIn || 0) / (adminScanStats.totalSold || 1) * 100).toFixed(1)}%)
                   </h2>
                 </div>
-                <div className="metric-card warning" style={{ background: '#fef9e7' }}>
+                <div className="metric-card warning">
                   <span>CHỜ CHECK-IN</span>
-                  <h2 style={{ color: '#f39c12' }}>{adminScanStats.totalPending || 0} vé</h2>
+                  <h2>{adminScanStats.totalPending || 0} vé</h2>
                 </div>
-                <div className="metric-card danger" style={{ background: '#fdf2f2' }}>
+                <div className="metric-card danger">
                   <span>LƯỢT TỪ CHỐI / CẢNH BÁO</span>
-                  <h2 style={{ color: '#e74c3c' }}>{adminScanStats.totalRejected || 0} lượt</h2>
+                  <h2>{adminScanStats.totalRejected || 0} lượt</h2>
                 </div>
               </div>
             )}
 
-            {/* Filter Section */}
-            <div style={{ background: '#fafafa', padding: '16px 20px', border: '1px solid #eee', borderRadius: '6px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '15px', justifyContent: 'space-between' }}>
+            <div style={{ background: 'var(--bg-card)', padding: '16px 20px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', marginBottom: '24px', display: 'flex', alignItems: 'center', gap: '15px', justifyContent: 'space-between' }}>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <label style={{ fontWeight: 'bold', fontSize: '13px' }}>Bộ lọc trạng thái quét:</label>
                 <select 
                   value={scanFilterResult} 
                   onChange={e => setScanFilterResult(e.target.value)}
-                  style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid #ccc', minWidth: '180px' }}
+                  style={{ padding: '6px 12px', borderRadius: '4px', border: '1px solid rgba(255, 255, 255, 0.08)', background: 'var(--bg-card)', color: '#fff', minWidth: '180px' }}
                 >
                   <option value="">Tất cả kết quả</option>
                   <option value="success">Thành công (success)</option>
@@ -937,7 +936,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
               </div>
               <button 
                 className="btn" 
-                style={{ background: '#111', color: '#fff', fontSize: '12px' }}
+                style={{ background: 'var(--primary-teal)', color: '#fff', fontSize: '12px' }}
                 onClick={() => {
                   loadAdminScanLogs(scanFilterResult);
                   loadAdminScanStats();
@@ -964,7 +963,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                 <tbody>
                   {adminScanLogs.length > 0 ? (
                     adminScanLogs.map(log => (
-                      <tr key={log.id} style={{ background: log.scanResult === 'failed' ? '#fff9f9' : '#fff' }}>
+                      <tr key={log.id} style={{ background: log.scanResult === 'failed' ? 'rgba(231, 76, 60, 0.05)' : 'rgba(255, 255, 255, 0.02)' }}>
                         <td style={{ fontSize: '12px' }}>
                           {new Date(log.createdAt || log.scannedAt).toLocaleString('vi-VN')}
                         </td>
@@ -982,7 +981,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                             {log.scanResult === 'success' ? 'Thành công' : 'Từ chối'}
                           </span>
                         </td>
-                        <td style={{ fontSize: '13px', color: log.scanResult === 'failed' ? '#c0392b' : '#333' }}>
+                        <td style={{ fontSize: '13px', color: log.scanResult === 'failed' ? '#e74c3c' : 'var(--text-dark)' }}>
                           <b>{log.reason || log.failureReason || 'Chi tiết thành công'}</b>
                         </td>
                         <td className="muted" style={{ fontSize: '11px' }}>
@@ -1008,7 +1007,7 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
             <h1 style={{ fontWeight: 900, marginBottom: '20px' }}>🖼️ QUẢN LÝ BANNER QUẢNG CÁO TRANG CHỦ</h1>
             <p className="muted" style={{ marginBottom: '24px' }}>Cấu hình slider quảng cáo trang chủ động, liên kết phim và thứ tự ưu tiên hiển thị.</p>
 
-            <form onSubmit={handleAdminCreateBanner} style={{ background: '#fff', padding: '24px', border: '1px solid #ddd', borderRadius: '4px', marginBottom: '30px' }}>
+            <form onSubmit={handleAdminCreateBanner} style={{ background: 'var(--bg-card)', padding: '24px', border: '1px solid rgba(255, 255, 255, 0.05)', borderRadius: '8px', marginBottom: '30px' }}>
               <h3 style={{ fontWeight: 900, marginBottom: '16px' }}>➕ THÊM BANNER MỚI</h3>
               <div className="admin-form-grid">
                 <div className="form-group">
@@ -1060,9 +1059,9 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
               </div>
               <div className="form-group" style={{ marginTop: '15px' }}>
                 <label>Mô tả chi tiết</label>
-                <textarea name="description" placeholder="Nội dung mô tả tóm tắt..." style={{ height: '70px', width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }}></textarea>
+                <textarea name="description" placeholder="Nội dung mô tả tóm tắt..." style={{ height: '70px', width: '100%', padding: '8px', border: '1px solid rgba(255, 255, 255, 0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px', fontFamily: 'inherit' }}></textarea>
               </div>
-              <button className="btn" style={{ background: '#111', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
+              <button className="btn" style={{ background: 'var(--primary-teal)', color: '#fff', marginTop: '16px', padding: '12px 30px' }}>
                 TẠO BANNER QUẢNG CÁO MỚI
               </button>
             </form>
@@ -1170,8 +1169,8 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
 
       {/* MODALS EDITING */}
       {editingMovie && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
-          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: 'var(--card-shadow)' }}>
             <h3 style={{ fontWeight: 900, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>📝 CẬP NHẬT PHIM</span>
               <button onClick={() => setEditingMovie(null)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#888' }}>&times;</button>
@@ -1180,15 +1179,15 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div className="form-group">
                   <label>Tên phim</label>
-                  <input name="title" defaultValue={editingMovie.title} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="title" defaultValue={editingMovie.title} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Thể loại</label>
-                  <input name="genre" defaultValue={editingMovie.genre} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="genre" defaultValue={editingMovie.genre} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Độ tuổi (Badge)</label>
-                  <select name="age" defaultValue={editingMovie.age} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                  <select name="age" defaultValue={editingMovie.age} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-card)', color: '#fff', borderRadius: '4px' }}>
                     <option value="P">P (Phổ biến rộng rãi)</option>
                     <option value="K">K (Dành cho trẻ em)</option>
                     <option value="T13">T13 (Trên 13 tuổi)</option>
@@ -1198,27 +1197,27 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
                 </div>
                 <div className="form-group">
                   <label>Thời lượng</label>
-                  <input name="duration" defaultValue={editingMovie.duration} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="duration" defaultValue={editingMovie.duration} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Poster URL</label>
-                  <input name="poster" defaultValue={editingMovie.poster} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="poster" defaultValue={editingMovie.poster} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Trạng thái</label>
-                  <select name="status" defaultValue={editingMovie.status} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                  <select name="status" defaultValue={editingMovie.status} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-card)', color: '#fff', borderRadius: '4px' }}>
                     <option value="now">Đang Chiếu (Now Playing)</option>
                     <option value="soon">Sắp Chiếu (Coming Soon)</option>
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Phòng chiếu cố định</label>
-                  <input name="room" defaultValue={editingMovie.room} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="room" defaultValue={editingMovie.room} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
               </div>
               <div className="form-group" style={{ marginTop: '15px' }}>
                 <label>Mô tả ngắn</label>
-                <textarea name="desc" defaultValue={editingMovie.desc} required style={{ width: '100%', height: '80px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }} />
+                <textarea name="desc" defaultValue={editingMovie.desc} required style={{ width: '100%', height: '80px', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px', fontFamily: 'inherit' }} />
               </div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
                 <button type="button" className="btn outline" onClick={() => setEditingMovie(null)}>HỦY</button>
@@ -1230,8 +1229,8 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
       )}
 
       {editingShowtime && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
-          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', boxShadow: 'var(--card-shadow)' }}>
             <h3 style={{ fontWeight: 900, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>📝 CẬP NHẬT SUẤT CHIẾU</span>
               <button onClick={() => setEditingShowtime(null)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#888' }}>&times;</button>
@@ -1243,23 +1242,23 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
               <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
                 <div className="form-group">
                   <label>Phim chiếu</label>
-                  <select name="movieId" defaultValue={editingShowtime.movieId} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                  <select name="movieId" defaultValue={editingShowtime.movieId} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-card)', color: '#fff', borderRadius: '4px' }}>
                     {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Ngày chiếu</label>
-                  <input name="date" type="date" defaultValue={editingShowtime.date} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="date" type="date" defaultValue={editingShowtime.date} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Giờ chiếu</label>
-                  <select name="time" defaultValue={editingShowtime.time} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }}>
+                  <select name="time" defaultValue={editingShowtime.time} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-card)', color: '#fff', borderRadius: '4px' }}>
                     {showtimes.map(t => <option key={t} value={t}>{t}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Giá vé tiêu chuẩn (đ)</label>
-                  <input name="price" type="number" defaultValue={editingShowtime.price} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="price" type="number" defaultValue={editingShowtime.price} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
               </div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
@@ -1272,8 +1271,8 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
       )}
 
       {editingBanner && (
-        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
-          <div style={{ background: '#fff', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: '0 10px 25px rgba(0,0,0,0.3)' }}>
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.7)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1000, backdropFilter: 'blur(5px)' }}>
+          <div style={{ background: 'var(--bg-card)', border: '1px solid rgba(255, 255, 255, 0.08)', padding: '30px', borderRadius: '8px', width: '90%', maxWidth: '600px', maxHeight: '90vh', overflowY: 'auto', boxShadow: 'var(--card-shadow)' }}>
             <h3 style={{ fontWeight: 900, marginBottom: '20px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               <span>📝 CẬP NHẬT BANNER</span>
               <button onClick={() => setEditingBanner(null)} style={{ border: 'none', background: 'transparent', fontSize: '24px', cursor: 'pointer', color: '#888' }}>&times;</button>
@@ -1282,54 +1281,54 @@ export default function AdminDashboard({ user, handleLogout, movies, nowMovies, 
               <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px' }}>
                 <div className="form-group">
                   <label>Tiêu đề chính</label>
-                  <input name="title" defaultValue={editingBanner.title} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="title" defaultValue={editingBanner.title} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Eyebrow (Dòng mô tả phụ phía trên)</label>
-                  <input name="eyebrow" defaultValue={editingBanner.eyebrow} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="eyebrow" defaultValue={editingBanner.eyebrow} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Liên kết phim (Chọn nếu muốn liên kết)</label>
-                  <select name="movieId" defaultValue={editingBanner.movieId || ''}>
+                  <select name="movieId" defaultValue={editingBanner.movieId || ''} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-card)', color: '#fff', borderRadius: '4px' }}>
                     <option value="">-- Không liên kết --</option>
                     {movies.map(m => <option key={m.id} value={m.id}>{m.title}</option>)}
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Đường dẫn hình ảnh (URL)</label>
-                  <input name="imageUrl" defaultValue={editingBanner.imageUrl} required style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="imageUrl" defaultValue={editingBanner.imageUrl} required style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Chữ trên nút bấm</label>
-                  <input name="buttonText" defaultValue={editingBanner.buttonText} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="buttonText" defaultValue={editingBanner.buttonText} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Liên kết khi bấm nút (Optional)</label>
-                  <input name="buttonLink" defaultValue={editingBanner.buttonLink} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="buttonLink" defaultValue={editingBanner.buttonLink} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Độ ưu tiên hiển thị</label>
-                  <input name="priority" type="number" defaultValue={editingBanner.priority} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="priority" type="number" defaultValue={editingBanner.priority} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Trạng thái</label>
-                  <select name="status" defaultValue={editingBanner.status}>
+                  <select name="status" defaultValue={editingBanner.status} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'var(--bg-card)', color: '#fff', borderRadius: '4px' }}>
                     <option value="active">Hoạt động (Active)</option>
                     <option value="inactive">Tạm ngưng (Inactive)</option>
                   </select>
                 </div>
                 <div className="form-group">
                   <label>Ngày bắt đầu hiển thị</label>
-                  <input name="startDate" type="date" defaultValue={editingBanner.startDate || ''} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="startDate" type="date" defaultValue={editingBanner.startDate || ''} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
                 <div className="form-group">
                   <label>Ngày kết thúc hiển thị</label>
-                  <input name="endDate" type="date" defaultValue={editingBanner.endDate || ''} style={{ width: '100%', padding: '8px', border: '1px solid #ddd', borderRadius: '4px' }} />
+                  <input name="endDate" type="date" defaultValue={editingBanner.endDate || ''} style={{ width: '100%', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px' }} />
                 </div>
               </div>
               <div className="form-group" style={{ marginTop: '15px' }}>
                 <label>Mô tả chi tiết</label>
-                <textarea name="description" defaultValue={editingBanner.description} style={{ width: '100%', height: '70px', padding: '8px', border: '1px solid #ddd', borderRadius: '4px', fontFamily: 'inherit' }} />
+                <textarea name="description" defaultValue={editingBanner.description} style={{ width: '100%', height: '70px', padding: '8px', border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.01)', color: '#fff', borderRadius: '4px', fontFamily: 'inherit' }} />
               </div>
               <div style={{ display: 'flex', gap: '10px', marginTop: '20px', justifyContent: 'flex-end' }}>
                 <button type="button" className="btn outline" onClick={() => setEditingBanner(null)}>HỦY</button>
